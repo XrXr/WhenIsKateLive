@@ -1,6 +1,6 @@
 #When is Kate Live?
 
-The web page is live [here][live page] thanks to Github pages!
+###The web page is live [here][live page] thanks to Github pages!
 
 This is a web page that contains the following
  - Schedule of [Kate Live] in PST and UTC
@@ -8,6 +8,10 @@ This is a web page that contains the following
  - Time of the next [Kate Live] in the browser's local time
 
 This is inspired by [whenisnlss.com](http://whenisnlss.com/) and made at the request of this [Reddit post]
+
+##Libraries used
+ - BootStrap css (through cdn)
+ - Moment.js (served with project)
 
 ##Building
 On the [live page] minified version of libraries are used. The scripts belonging to this project uses [Closure Compiler]
