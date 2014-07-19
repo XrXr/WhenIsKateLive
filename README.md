@@ -3,9 +3,8 @@
 ###The web page is live [here][live page] thanks to Github pages!
 
 This is a web page that contains the following
- - Schedule of [Kate Live] in PST and UTC
  - Count down until the next [Kate Live]
- - Time of the next [Kate Live] in the browser's local time
+ - Schedule of [Kate Live] in the browser's local time
 
 This is inspired by [whenisnlss.com](http://whenisnlss.com/) and made at the request of this [Reddit post]
 
@@ -19,7 +18,11 @@ for minification.
 
 ##License
 [MIT](LICENSE.txt) for non-vender code.
-If you use part of the project somehow, let me know! (You don't have to)
+If you use part(s) of the project somehow, let me know! (You don't have to)
+
+##Browser support
+Haphazardly tested on Firefox 30 and Google Chrome 35. Mostly functional on IE 11.
+There are no plans to support any version of IE
 
 [Reddit post]: http://www.reddit.com/r/KateArmy/comments/2a8gna/can_we_get_something_like_whenisnlsscom/
 [live page]: http://xrxr.github.io/WhenIsKateLive/
