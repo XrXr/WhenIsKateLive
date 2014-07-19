@@ -18,7 +18,11 @@
     -moz-box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.75);
     box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.75);
 }
-h1, h3, th, td, .about-center{
+.soft-hide{
+    opacity: 0;
+    height: 0;
+}
+h1, h3, th, td, .about-center, .notice-center{
     text-align: center;
 }
 h1{
@@ -30,6 +34,9 @@ h3{
 }
 table {
     width: 100%
+}
+a:hover{
+    text-decoration: none;
 }
 body{
     background-color: pink;
@@ -62,6 +69,7 @@ body{
   }
 }
 .twitter-username, .twitch-username, .youtube-username{
+    color: #333;
     font-size: 40px;
     line-height: 1;
 }
@@ -75,7 +83,6 @@ body{
     content: "ProBoxStudio";
 }
 .twitch-block, .youtube-block, .twitter-block{
-    outline: 0;
     color: inherit;
     display: inline-block;
     position: relative;
@@ -84,10 +91,17 @@ body{
     margin-bottom: 25px;
     float: left;
 }
-.twitch-block:focus, .youtube-block:focus, .twitter-block:focus{
+.prefix{
+    color: #333 !important;
+    cursor: default;
+}
+.disguise{
+    text-decoration: none !important;
+}
+.disguise:focus{
     outline:0;
 }
-.twitch-block:hover, .youtube-block:hover, .twitter-block:hover{
+.disguise:hover{
     color: inherit;
     text-decoration: none;
 }
