@@ -1,3 +1,6 @@
+// Author: XrXr
+// https://github.com/XrXr/WhenIsKateLive
+// License: MIT
 (function(){
     "use strict";
 

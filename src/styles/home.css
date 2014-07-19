@@ -1,3 +1,6 @@
+/* Author:XrXr
+https://github.com/XrXr/WhenIsKateLive
+License:MIT */
 .center-region {
     top: 0px;
     bottom: 0px;
@@ -16,30 +19,33 @@
     border-radius: 15px;
     -webkit-box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.75);
     -moz-box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.75);
-    box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.75);
+    box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.75)
 }
-.soft-hide{
+.soft-hide {
     opacity: 0;
-    height: 0;
+    height: 0
 }
-h1, h3, th, td, .about-center, .notice-center{
-    text-align: center;
+h1, h3, th, td, .about-center, .notice-center {
+    text-align: center
 }
-h1{
+h1 {
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 20px
 }
-h3{
-   margin-bottom: 0px;
+h3 {
+    margin-bottom: 0px
 }
 table {
     width: 100%
 }
-a:hover{
-    text-decoration: none;
+a:hover {
+    text-decoration: none
 }
-body{
-    background-color: pink;
+body {
+    background-color: pink
+}
+a {
+    pointer-events: all
 }
 .overlay-block {
     width: 100%;
@@ -47,103 +53,104 @@ body{
     max-width: 1024px;
     background-image: url(/assets/overlay.png);
     background-position: center 0;
-    background-repeat: no-repeat;
+    background-repeat: no-repeat
 }
 .about-blcok {
     position: absolute;
     left: 10px;
     width: calc(100% - 10px);
-    bottom: 0px;
+    bottom: 0px
 }
-.about-block-element{
+.about-block-element {
+    pointer-events: none;
     position: absolute;
     bottom: 0;
-    width: inherit;
+    width: inherit
 }
-.about-right{
-    text-align: right;
+.about-right {
+    text-align: right
 }
-@media (max-width: 894px) {
-  .about-blcok {
-    display: none;
-  }
+@media (max-width:894px) {
+    .about-blcok {
+        display: none
+    }
 }
-.twitter-username, .twitch-username, .youtube-username{
+.twitter-username, .twitch-username, .youtube-username {
     color: #333;
     font-size: 40px;
-    line-height: 1;
+    line-height: 1
 }
-.twitter-username::before{
-    content: "@lovelykaitkim";
+.twitter-username::before {
+    content: "@lovelykaitkim"
 }
-.twitch-username::before{
-    content: "LovelyMomo";
+.twitch-username::before {
+    content: "LovelyMomo"
 }
-.youtube-username::before{
-    content: "ProBoxStudio";
+.youtube-username::before {
+    content: "ProBoxStudio"
 }
-.twitch-block, .youtube-block, .twitter-block{
+.twitch-block, .youtube-block, .twitter-block {
     color: inherit;
     display: inline-block;
     position: relative;
     margin-left: 50px;
     margin-top: 25px;
     margin-bottom: 25px;
-    float: left;
+    float: left
 }
-.prefix{
+.prefix {
     color: #333 !important;
-    cursor: default;
+    cursor: default
 }
-.disguise{
-    text-decoration: none !important;
+.disguise {
+    text-decoration: none !important
 }
-.disguise:focus{
-    outline:0;
+.disguise:focus {
+    outline: 0
 }
-.disguise:hover{
+.disguise:hover {
     color: inherit;
-    text-decoration: none;
+    text-decoration: none
 }
-.twitch-logo, .youtube-logo, .twitter-logo{
+.twitch-logo, .youtube-logo, .twitter-logo {
     position: relative;
     width: 45px;
     height: 45px;
-    float: left;
+    float: left
 }
-.twitter-block{
+.twitter-block {
     top: 0;
     left: 0;
     margin-left: 10px;
-    float: left;
+    float: left
 }
-.twitter-logo{
-    top: 5px;
+.twitter-logo {
+    top: 5px
 }
-.youtube-logo{
-    top: 3px;
+.youtube-logo {
+    top: 3px
 }
-.youtube-username{
-    margin-left: 10px;
+.youtube-username {
+    margin-left: 10px
 }
-@media (max-width: 1430px){
-    .twitter-username::before{
-        content: "";
+@media (max-width:1430px) {
+    .twitter-username::before {
+        content: ""
     }
-    .twitch-username::before{
-        content: "";
+    .twitch-username::before {
+        content: ""
     }
-    .youtube-username::before{
-        content: "";
+    .youtube-username::before {
+        content: ""
     }
-    .twitch-block{
+    .twitch-block {
         position: absolute;
         left: calc(50% - 22.5px);
         margin-left: 0;
-        margin-right: 0;
+        margin-right: 0
     }
-    .youtube-block{
+    .youtube-block {
         right: 0px;
-        position: absolute;
+        position: absolute
     }
 }
