@@ -3,9 +3,10 @@
 // License: MIT
 (function(){
     "use strict";
+    var entry_date = new Date();
 
     var to_local = (function(){
-        var target_offset = (new Date()).getTimezoneOffset();
+        var target_offset = entry_date.getTimezoneOffset();
         return function(moment_instance){
             moment_instance.zone(target_offset);
             return moment_instance;
@@ -13,6 +14,8 @@
     })();
 
     var streams = (function(){
+        var PST_OFFSET = 480; // PST = GMT-8, 8 * 60 = 480. PST's offset from gmt is 480 minutes
+        var PDT_OFFSET = 420;
         var weekday_names = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
         function iso_to_eng (num) {
             if (num < 1 || num > 7 || !Number.isInteger(num)){
@@ -88,7 +91,11 @@
 
         var streams = {};
         var base = moment(0);
-        base.zone(480); // PST = GMT-8, 8 * 60 = 480. PST's offset from gmt is 480 minutes
+        base.zone(PST_OFFSET);
+        // very glad ther is only one defination of DST
+        if (moment(entry_date).isDST()){
+            base.zone(PDT_OFFSET);
+        }
         var temp = null;
         Object.defineProperty(streams, "length", {value: SCHEDULE.length});
         SCHEDULE.forEach(function(e, index){
@@ -126,6 +133,7 @@
         });
         return streams;
     })();
+
 
 
     function normalize (moment_instance) {
@@ -220,13 +228,13 @@
         }
 
         function add_class (node, name) {
-            if (node.className.match(get_regex(name).length === 0)){
+            if (node.className.match(get_regex(name)).length === 0){
                 node.className += " " + name;
             }
         }
 
         function remove_class (node, name) {
-            if (node.className.match(get_regex(name).length > 0)){
+            if (node.className.match(get_regex(name)).length > 0){
                 node.className = node.className.replace(get_regex(name), '');
             }
         }
