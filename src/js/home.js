@@ -228,12 +228,15 @@
         }
 
         function add_class (node, name) {
-            if (node.className.match(get_regex(name)).length === 0){
+            if (node.className === ""){
                 node.className += " " + name;
             }
         }
 
         function remove_class (node, name) {
+            if (!node.className){
+                return;
+            }
             if (node.className.match(get_regex(name)).length > 0){
                 node.className = node.className.replace(get_regex(name), '');
             }
