@@ -92,7 +92,7 @@
         var streams = {};
         var base = moment(0);
         base.zone(PST_OFFSET);
-        // very glad ther is only one defination of DST
+        // very glad there is only one defination of DST
         if (moment(entry_date).isDST()){
             base.zone(PDT_OFFSET);
         }
