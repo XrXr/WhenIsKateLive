@@ -274,6 +274,8 @@
 
     var stream = streams[0];
     var last_check = true;
+    // TODO: this needs better implementation
+    // countdown dom update should be in the fastest lane
     function tick() {
         // check if the stream currently holding is live
         // yes -> show dom
@@ -287,6 +289,7 @@
             last_check = true;
             return update_dom(true);
         }
+        // TODO: this could be: check if now is after stream.end
         if (last_check){
             last_check = false;
             stream = find_next_stream(streams, now);
