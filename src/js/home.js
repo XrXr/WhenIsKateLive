@@ -14,8 +14,6 @@
     })();
 
     var streams = (function(){
-        var PST_OFFSET = 480; // PST = GMT-8, 8 * 60 = 480. PST's offset from gmt is 480 minutes
-        var PDT_OFFSET = 420;
         var weekday_names = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
         function iso_to_eng (num) {
             if (num < 1 || num > 7 || !Number.isInteger(num)){
@@ -33,22 +31,24 @@
             return index + 1;
         }
 
-        function Schedule(weekday_name, start, duration) {
+        function TimeSlot(weekday_name, start, duration) {
             // This object makes schedule entries readable
-            if (!(this instanceof Schedule)){
-                return new Schedule(weekday_name, start, duration);
+            if (!(this instanceof TimeSlot)){
+                return new TimeSlot(weekday_name, start, duration);
             }
-            this.key = weekday_name.toLowerCase();
             this.start = start;
             this.isoWeekday = eng_to_iso(weekday_name);
             this.duration = duration;
         }
         // its probably better to construct these in less steps
         // however this is much more readable;
-        var SCHEDULE = [Schedule("Monday", 20, 3),
-                        Schedule("Tuesday", 13, 2),
-                        Schedule("Thursday", 22, 2),
-                        Schedule("Saturday", 20, 3)];
+        var SCHEDULE = [TimeSlot("Monday",    "8:00  PM", 3),
+                        TimeSlot("Tuesday",   "10:00 AM", 2),
+                        TimeSlot("Wednesday", "10:00 AM", 2),
+                        TimeSlot("Thursday",  "10:00 PM", 2),
+                        TimeSlot("Friday",    "5:30  PM", 2),
+                        TimeSlot("Saturday",  "8:00  PM", 3),
+                        TimeSlot("Sunday",    "11:00 AM", 2)];
 
         function Stream(start_time, duration) {
             // new Stream() and Stream() both work
@@ -69,19 +69,31 @@
         Stream.prototype.normalize = function(){
             // move start and end to the first week of 1970
             this.start.year(1970);
-            this.start.isoWeek(1);
+            this.start.isoWeeks(1);
 
             this.end.year(1970);
-            this.end.isoWeek(1);
+            this.end.isoWeeks(1);
         };
+
+        function get_base_format (moment_instance) {
+            if (moment_instance.minutes() > 0){
+                return ["h:m", "a"];
+            }
+            return ["h", "a"];
+        }
 
         Stream.prototype.toString = function(){
             var start_signature = this.start.format("a");
-            if (start_signature === this.end.format("a")){
-                return this.start.format("h") + " to " +
-                       this.end.format("h") + " " + start_signature;
+            var end_signature = this.end.format("a");
+
+            var start_format = get_base_format(this.start);
+            var end_format = get_base_format(this.end);
+
+            if (start_signature === end_signature){
+                start_format.pop();
             }
-            return this.start.format("h a") + " to " + this.end.format("h a");
+            return this.start.format(start_format.join(" ")) +
+                " to " + this.end.format(end_format.join(" "));
         };
 
         Stream.prototype.is_live = function(timestamp){
@@ -91,19 +103,17 @@
 
         var streams = {};
         var base = moment(0);
-        base.zone(PST_OFFSET);
         // very glad there is only one defination of DST
-        if (moment(entry_date).isDST()){
-            base.zone(PDT_OFFSET);
-        }
-        var temp = null;
+        var to_append = moment(entry_date).isDST() ? "-0700" : "-0800";
+        var format = "h:m a Z";
+
         Object.defineProperty(streams, "length", {value: SCHEDULE.length});
         SCHEDULE.forEach(function(e, index){
-            temp = base.clone();
-            temp.isoWeekday(e.isoWeekday);
-            temp.hours(e.start);
-            streams[index] = new Stream(temp, e.duration);
-            streams[index].convert_time();
+            streams[index] = new Stream(moment(e.start + " " + to_append, format).
+                                        year(1970).
+                                        isoWeek(1).
+                                        isoWeekday(e.isoWeekday),
+                                    e.duration);
         });
 
         function compare_moment_instance (a, b) {
@@ -133,6 +143,8 @@
         });
         return streams;
     })();
+
+    window.streams = streams;
 
 
 
