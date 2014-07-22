@@ -156,7 +156,11 @@
         normalized.year(1970);
         normalized.isoWeek(1);
         normalized.isoWeekday(moment_instance.isoWeekday());
-        normalized.hours(moment_instance.hours());
+        var hrs = moment_instance.hours();
+        if (moment(entry_date).isDST()){
+            hrs++;
+        }
+        normalized.hour(hrs);
         normalized.minutes(moment_instance.minutes());
         normalized.seconds(moment_instance.seconds());
         return normalized;
