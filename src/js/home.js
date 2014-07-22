@@ -144,10 +144,6 @@
         return streams;
     })();
 
-    window.streams = streams;
-
-
-
     function normalize (moment_instance) {
         // return a Moment instance that has the same day of week and hour info
         // with the begining of the week at the Unix Epoch.
