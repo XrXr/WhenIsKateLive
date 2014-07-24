@@ -3,16 +3,9 @@
 // License: MIT
 (function(){
     "use strict";
-    var entry_date = new Date();
-
-    var to_local = (function(){
-        var target_offset = entry_date.getTimezoneOffset();
-        return function(moment_instance){
-            moment_instance.zone(target_offset);
-            return moment_instance;
-        };
-    })();
-
+    // is the streamer observing DST?
+    var streamer_dst = moment().tz("america/vancouver").isDST();
+    var visitor_timezone_offset = (new Date()).getTimezoneOffset();
     var streams = (function(){
         var weekday_names = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
         function iso_to_eng (num) {
@@ -55,25 +48,14 @@
             if (!(this instanceof Stream)){
                 return new Stream(start_time, duration);
             }
-            this.start = start_time.clone();
-            this.end = start_time.clone();
+            this.start = start_time.clone().zone(visitor_timezone_offset);
+            this.end = start_time.clone().zone(visitor_timezone_offset);
             this.end.add('hours', duration);
             this.duration = duration;
+            // normalized to the start of the iso week
+            this.start_normalized = this.start.unix() - this.start.clone().startOf("isoWeek").unix();
+            this.end_normalized = this.end.unix() - this.end.clone().startOf("isoWeek").unix();
         }
-
-        Stream.prototype.convert_time = function(){
-            to_local(this.start);
-            to_local(this.end);
-        };
-
-        Stream.prototype.normalize = function(){
-            // move start and end to the first week of 1970
-            this.start.year(1970);
-            this.start.isoWeeks(1);
-
-            this.end.year(1970);
-            this.end.isoWeeks(1);
-        };
 
         function get_base_format (moment_instance) {
             if (moment_instance.minutes() > 0){
@@ -96,23 +78,20 @@
                 " to " + this.end.format(end_format.join(" "));
         };
 
-        Stream.prototype.is_live = function(timestamp){
-            // timestamp needs to be normalized first
-            return timestamp >= this.start.unix() && timestamp <= this.end.unix();
+        Stream.prototype.is_live = function(since_week_start){
+            // in seconds
+            return since_week_start >= this.start_normalized &&
+                   since_week_start <= this.end_normalized;
         };
 
         var streams = {};
-        var base = moment(0);
-        // very glad there is only one defination of DST
-        var to_append = moment(entry_date).isDST() ? "-0700" : "-0800";
-        var format = "h:m a Z";
+        var timezone_suffix = streamer_dst ? "-0700" : "-0800";
+        var format = "h:m a Z E WW YYYY";
 
         Object.defineProperty(streams, "length", {value: SCHEDULE.length});
         SCHEDULE.forEach(function(e, index){
-            streams[index] = new Stream(moment(e.start + " " + to_append, format).
-                                        year(1970).
-                                        isoWeek(1).
-                                        isoWeekday(e.isoWeekday),
+            streams[index] = new Stream(moment(e.start + " " + timezone_suffix +
+                                        " " + e.isoWeekday + " " + "1" + " 1970", format),
                                     e.duration);
         });
 
@@ -144,35 +123,14 @@
         return streams;
     })();
 
-    function normalize (moment_instance) {
-        // return a Moment instance that has the same day of week and hour info
-        // with the begining of the week at the Unix Epoch.
-        // does not mutate the original
-        var normalized = moment(0);
-        // This should do nothing in a normal use case. However, if the system timezone is changed
-        // during the execution of this script, this will make sure all the output is self consistent
-        // (all times are converted to the first observed timezone)
-        to_local(normalized);
-        normalized.year(1970);
-        normalized.isoWeek(1);
-        normalized.isoWeekday(moment_instance.isoWeekday());
-        var hrs = moment_instance.hours();
-        if (moment(entry_date).isDST()){
-            hrs++;
-        }
-        normalized.hour(hrs);
-        normalized.minutes(moment_instance.minutes());
-        normalized.seconds(moment_instance.seconds());
-        return normalized;
-    }
-
-    function find_next_stream (streams, now) {
+    function find_next_stream (streams, since_week_start) {
         // return a Stream that is currently live
-        // if no such Stream exist, return the Stream with the closest start time
+        // if no such Stream exist, return the Stream with;
+        // the closest start time that is in the future
         var sorted = streams.get_sorted_array();
         var found;
         sorted.some(function(stream, index){
-            if (now.isAfter(stream.end)){
+            if (since_week_start > stream.end_normalized){
                 return false;  // continue
             }
             found = stream;
@@ -215,16 +173,18 @@
             return result.join(", ");
         }
 
-        function get_countdown (now_unix, stream) {
-            var delta = stream.start.unix() - now_unix;
+        var a_week = 604800;
+        function get_countdown (now, target) {
+            // in seconds
+            var delta = target - now;
             if (delta > 0){
                 return format_countdown(delta);
             }
             if (delta < 0){
-                return format_countdown(stream.start.clone().add('weeks', 1).unix() - now_unix);
+                return format_countdown(stream.start_normalized + a_week - now);
             }
             // this should never happen. See tick()
-            throw new Error("get_countdown() called with Invalid arguments");
+            throw new Error("get_countdown() called with invalid arguments");
         }
         return get_countdown;
     })();
@@ -305,9 +265,10 @@
         // no  -> was the last live check yes?
         //        yes -> change holding stream to the next stream, recursion
         //         no -> calculate time until start, show dom
-        var now = normalize(moment());
+        var now = moment();
         var now_unix = now.unix();
-        var is_live = stream.is_live(now_unix);
+        var since_week_start = now_unix - now.clone().startOf("isoWeek").unix();
+        var is_live = stream.is_live(since_week_start);
         if (is_live){
             last_check = true;
             return update_dom(true);
@@ -315,11 +276,11 @@
         // TODO: this could be: check if now is after stream.end
         if (last_check){
             last_check = false;
-            stream = find_next_stream(streams, now);
+            stream = find_next_stream(streams, since_week_start);
             return tick();
         }
         last_check = false;
-        return update_dom(false, get_countdown(now_unix, stream));
+        return update_dom(false, get_countdown(since_week_start, stream.start_normalized));
     }
     /********Entry point*********/
     tick();
