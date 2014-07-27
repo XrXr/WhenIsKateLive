@@ -1,3 +1,17 @@
+describe('Totally redundant timezone conversion validations', function() {
+    it('should covert to convert properly', function() {
+        var converted = make_stream(TimeSlot("Thursday", "11:00 PM", 2));
+        var delta = streamer_dst ? 7 * 60 - window.visitor_timezone_offset :
+            8 * 60 - window.visitor_timezone_offset;
+        var day = 4;
+        if (delta / 60 + 23 > 24){
+            day = 5;
+        }
+        var time = (23 + delta / 60) % 24;
+        expect(converted.start.isoWeekday()).to.equal(day);
+        expect(converted.start.hours()).to.equal(time);
+    });
+});
 describe('streams object', function(){
     it('should have a length property', function(){
         expect(streams).to.have.property("length");

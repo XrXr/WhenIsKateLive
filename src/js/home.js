@@ -88,48 +88,28 @@
         var timezone_suffix = streamer_dst ? "-0700" : "-0800";
         var format = "h:m a Z E WW YYYY";
 
-        Object.defineProperty(streams, "length", {value: SCHEDULE.length});
-        SCHEDULE.forEach(function(e, index){
-            streams[index] = new Stream(moment(e.start + " " + timezone_suffix +
-                                        " " + e.isoWeekday + " " + "1" + " 1970", format),
-                                    e.duration);
-        });
-
-        function compare_moment_instance (a, b) {
-            return a.start.unix() - b.start.unix();
+        function make_stream (time_slot) {
+            return new Stream(moment(time_slot.start + " " + timezone_suffix +
+                                        " " + time_slot.isoWeekday + " " + "1" + " 1970", format),
+                                    time_slot.duration);
         }
 
-        Object.defineProperty(streams, "get_sorted_array", {
-            // return an array with all the Stream sorted in
-            // chronological order
-            value: (function(){
-                // sort once
-                var sorted = null;
-                return function (){
-                    if (sorted !== null){
-                        return sorted;
-                    }
-                    var result = [];
-                    for (var key in this) {
-                        if (this.hasOwnProperty(key)) {
-                            result.push(this[key]);
-                        }
-                    }
-                    sorted = result.sort(compare_moment_instance);
-                    return result;
-                };
-            })()
-        });
-        return streams;
+        if (window.export_internals){
+            window.streamer_dst = streamer_dst;
+            window.visitor_timezone_offset = visitor_timezone_offset;
+            window.TimeSlot = TimeSlot;
+            window.make_stream = make_stream;
+        }
+
+        return SCHEDULE.map(make_stream);
     })();
 
     function find_next_stream (streams, since_week_start) {
         // return a Stream that is currently live
         // if no such Stream exist, return the Stream with;
         // the closest start time that is in the future
-        var sorted = streams.get_sorted_array();
         var found;
-        sorted.some(function(stream, index){
+        streams.some(function(stream, index){
             if (since_week_start > stream.end_normalized){
                 return false;  // continue
             }
@@ -137,7 +117,7 @@
             return true; // break
         });
         if (!found){
-            return sorted[0];
+            return streams[0];
         }
         return found;
     }
