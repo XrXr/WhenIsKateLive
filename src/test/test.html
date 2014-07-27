@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head profile="http://www.w3.org/2005/10/profile">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>When is Kate Live tests</title>
+    <!-- CHANGE/REMOVE BEFORE PRODUCTION -->
+    <link rel="icon"
+      type="image/png"
+      href="../assets/kateArmy.png">
+    <link rel="stylesheet" href="mocha.css">
+    <script src="../libs/moment.js"></script>
+    <script src="../libs/moment-timezone.min.js"></script>
+    <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+    <!-- CHANGE/REMOVE BEFORE PRODUCTION -->
+</head>
+<body>
+  <h2 style="text-align: center; font-family: helvetica">Please no failarino <img src="biblethump.png" height="30px" width="auto"></h2>
+  <!-- these are only here to satisfy the script -->
+  <div style="display:none;">
+    <h1><strong></strong></h1>
+    <h3></h3>
+    <small></small>
+    <table>
+      <tbody>
+        <tr></tr>
+        <tr></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="mocha" style="margin: 20px 50px;"></div>
+  <script src="mocha.js"></script>
+  <script src="chai.js"></script>
+  <script>mocha.setup('bdd');</script>
+  <script>expect = chai.expect;</script>
+  <script>var export_internals = true;</script>
+  <script src="../js/home.js"></script>
+  <script src="test.js"></script>
+</body>
+</html>

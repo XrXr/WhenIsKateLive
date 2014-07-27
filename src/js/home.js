@@ -181,7 +181,7 @@
                 return format_countdown(delta);
             }
             if (delta < 0){
-                return format_countdown(stream.start_normalized + a_week - now);
+                return format_countdown(target + a_week - now);
             }
             // this should never happen. See tick()
             throw new Error("get_countdown() called with invalid arguments");
@@ -281,6 +281,11 @@
         }
         last_check = false;
         return update_dom(false, get_countdown(since_week_start, stream.start_normalized));
+    }
+    if (window.export_internals){
+        window.get_countdown = get_countdown;
+        window.streams = streams;
+        window.find_next_stream = find_next_stream;
     }
     /********Entry point*********/
     tick();
