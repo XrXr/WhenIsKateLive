@@ -4,15 +4,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>When is Kate Live tests</title>
-    <!-- CHANGE/REMOVE BEFORE PRODUCTION -->
     <link rel="icon"
       type="image/png"
       href="../assets/kateArmy.png">
     <link rel="stylesheet" href="mocha.css">
-    <script src="../libs/moment.js"></script>
+    <script src="../libs/moment.min.js"></script>
     <script src="../libs/moment-timezone.min.js"></script>
-    <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
-    <!-- CHANGE/REMOVE BEFORE PRODUCTION -->
 </head>
 <body>
   <h2 style="text-align: center; font-family: helvetica">Please no failarino <img src="biblethump.png" height="30px" width="auto"></h2>
@@ -34,7 +31,7 @@
   <script>mocha.setup('bdd');</script>
   <script>expect = chai.expect;</script>
   <script>var export_internals = true;</script>
-  <script src="../js/home.js"></script>
+  <script src="../js/home.min.js"></script>
   <script src="test.js"></script>
 </body>
 </html>

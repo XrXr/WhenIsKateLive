@@ -12,12 +12,9 @@ describe('Totally redundant timezone conversion validations', function() {
         expect(converted.start.hours()).to.equal(time);
     });
 });
-describe('streams object', function(){
-    it('should have a length property', function(){
-        expect(streams).to.have.property("length");
-    });
-    it('has a element that is constructed using Stream()', function() {
-        expect(streams[0].constructor.name).to.equal("Stream");
+describe('streams', function(){
+    it('should be an array', function(){
+        expect(streams).to.be.a("Array");
     });
     describe('child', function() {
         var stream = streams[0];
