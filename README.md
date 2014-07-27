@@ -16,6 +16,9 @@ This is inspired by [whenisnlss.com](http://whenisnlss.com/) and made at the req
 On the [live page] minified version of libraries are used. The scripts belonging to this project uses [Closure Compiler]
 for minification.
 
+##Testing
+Tests are written with mocha and Chai
+
 ##License
 [MIT](LICENSE.txt) for non-vender code.
 If you use part(s) of the project somehow, let me know! (You don't have to)
