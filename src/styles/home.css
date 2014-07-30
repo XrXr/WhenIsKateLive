@@ -11,7 +11,7 @@ License:MIT */
     min-height: 767px;
     max-width: 1024px;
     min-width: 450px;
-    margin: auto;
+    margin: 0 auto;
     background-color: #F1EECC;
     position: absolute;
     -webkit-border-radius: 15px;
