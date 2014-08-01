@@ -5,138 +5,138 @@ License: MIT */
 /*============================================================================*/
 
 * {
-	box-sizing: inherit; /* Allows nested styles to define thier own */
+    box-sizing: inherit; /* Allows nested styles to define thier own */
 }
 
 html {
-	background-color: #ffc1ca;
-	padding: 0 16px;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	color: #333;
-	overflow-x: hidden;
-	max-width: 100%;
-	box-sizing: border-box;
+    background-color: #ffc1ca;
+    padding: 0 16px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #333;
+    overflow-x: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 body {
-	max-width: 1024px;
-	margin: 16px auto;
-	background: #f1eecc;
-	border-radius: 8px;
-	box-shadow: 0px 0px 16px rgba( 50, 50, 50, 0.75 );
-	display: flex;
-	flex-flow: column nowrap;
-	text-align: center;
+    max-width: 1024px;
+    margin: 16px auto;
+    background: #f1eecc;
+    border-radius: 8px;
+    box-shadow: 0px 0px 16px rgba( 50, 50, 50, 0.75 );
+    display: flex;
+    flex-flow: column nowrap;
+    text-align: center;
 }
 
 /*----------------------------------------------------------------------------*/
 
 h3 {
-	font-size: 24px;
-	font-weight: 500;
-	padding-top: 16px;
-	margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+    padding-top: 16px;
+    margin: 0;
 }
 
 .hidden {
-	display: none;
+    display: none;
 }
 
 h1 {
-	font-size: 36px;
-	font-weight: 500;
-	padding: 0 16px;
+    font-size: 36px;
+    font-weight: 500;
+    padding: 0 16px;
 }
 
 small {
-	font-size: 12px;
+    font-size: 12px;
 }
 
 table {
-	font-size: 14px;
-	width: 100%;
+    font-size: 14px;
+    width: 100%;
 }
 
 a {
-	color: #428bca;
-	text-decoration: none;
+    color: #428bca;
+    text-decoration: none;
 }
 
 a:hover {
-	color: #2a6496;
+    color: #2a6496;
 }
 
 .art {
-	width: 100%;
-	height: auto;
+    width: 100%;
+    height: auto;
 }
 
 nav {
-	display: flex;
-	flex-flow: row wrap;
-	align-items: stretch;
-	justify-content: space-around;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+    justify-content: space-around;
 }
 
 .site {
-	display: inline-block;
-	text-decoration: none;
-	font-size: 40px;
-	padding: 16px 0;
-	margin: 0 16px;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 40px;
+    padding: 16px 0;
+    margin: 0 16px;
 }
 
 .site img {
-	width: auto;
-	height: 0.8em; /* 4/5 of local text size */
-	vertical-align: middle;
+    width: auto;
+    height: 0.8em; /* 4/5 of local text size */
+    vertical-align: middle;
 }
 
 .site .name {
-	color: #333;
-	padding-left: 8px;
-	vertical-align: middle;
+    color: #333;
+    padding-left: 8px;
+    vertical-align: middle;
 }
 
 footer {
-	padding: 8px 16px;
-	display: flex;
-	flex-flow: row wrap;
-	justify-content: space-between;
-	font-size: 14px;
+    padding: 8px 16px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    font-size: 14px;
 }
 
 /*----------------------------------------------------------------------------*/
 
 @media(max-width:700px) {
-	table {
-		padding: 0 32px;
-		white-space: nowrap;
-		margin: 0 auto;
-		display: flex;
-		flex-flow: row nowrap;
-		width: auto;
-	}
-	
-	thead {
-		text-align: left;
-	}
-	
-	tbody {
-		text-align: right;
-	}
-	
-	tr {
-		display: flex;
-		flex-flow: column nowrap;
-	}
-	
-	th, td {
-		padding: 0 8px;
-	}
-	
-	.site {
-		font-size: 22px;
-		padding: 8px 0;
-	}
+    table {
+        padding: 0 32px;
+        white-space: nowrap;
+        margin: 0 auto;
+        display: flex;
+        flex-flow: row nowrap;
+        width: auto;
+    }
+    
+    thead {
+        text-align: left;
+    }
+    
+    tbody {
+        text-align: right;
+    }
+    
+    tr {
+        display: flex;
+        flex-flow: column nowrap;
+    }
+    
+    th, td {
+        padding: 0 8px;
+    }
+    
+    .site {
+        font-size: 22px;
+        padding: 8px 0;
+    }
 }
