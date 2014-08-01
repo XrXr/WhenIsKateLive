@@ -215,7 +215,7 @@
         var prefix = find("h3");
         var countdown = find("h1").children[0];
         var hide_class = "hidden";
-        var clock = "disguise prefix";
+        var clock = "disguise";
 
         function update_dom (live, countdown_string) {
             // second argument is ignored if live is true

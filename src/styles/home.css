@@ -1,13 +1,9 @@
-/* Author: XrXr
-https: //github.com/XrXr/WhenIsKateLive
-License: MIT */
-
-/*============================================================================*/
-
+/* Author:XrXr
+https://github.com/XrXr/WhenIsKateLive
+License:MIT */
 * {
     box-sizing: inherit; /* Allows nested styles to define thier own */
 }
-
 html {
     background-color: #ffc1ca;
     padding: 16px;
@@ -18,7 +14,6 @@ html {
     box-sizing: border-box;
     height: 100%;
 }
-
 body {
     max-width: 1024px;
     margin: 0 auto;
@@ -27,60 +22,46 @@ body {
     box-shadow: 0px 0px 16px rgba( 50, 50, 50, 0.75 );
     text-align: center;
     min-height: 100%;
-    
     display: -webkit-flex;
     -webkit-flex-flow: column nowrap;
-    
     display: flex;
     flex-flow: column nowrap;
 }
-
-/*----------------------------------------------------------------------------*/
-
 h3 {
     font-size: 24px;
     font-weight: 500;
     padding-top: 16px;
     margin: 0;
 }
-
 .hidden {
     display: none;
 }
-
 h1 {
     font-size: 36px;
     font-weight: 500;
     padding: 0 16px;
 }
-
 small {
     font-size: 12px;
 }
-
 table {
     font-size: 14px;
     width: 100%;
 }
-
 a {
     color: #428bca;
     text-decoration: none;
 }
-
 a:hover {
     color: #2a6496;
 }
-
 a.disguise {
     color: inherit;
 }
-
 .art {
     width: 100%;
     height: auto;
 }
-
 nav {
     display: -webkit-flex;
     -webkit-flex-grow: 1;
@@ -88,7 +69,6 @@ nav {
     -webkit-align-items: stretch;
     -webkit-align-content: flex-start;
     -webkit-justify-content: space-around;
-    
     display: flex;
     flex-grow: 1;
     flex-flow: row wrap;
@@ -96,7 +76,6 @@ nav {
     align-content: flex-start;
     justify-content: space-around;
 }
-
 .site {
     display: inline-block;
     text-decoration: none;
@@ -104,92 +83,71 @@ nav {
     padding: 16px 0;
     margin: 0 16px;
 }
-
 .site img {
     width: auto;
     height: 0.9em; /* 9/10 of local text size */
     vertical-align: middle;
 }
-
 .site .name {
     color: #333;
     padding-left: 8px;
     vertical-align: middle;
 }
-
 footer {
     padding: 8px 16px;
     font-size: 14px;
-    
     display: -webkit-flex;
     -webkit-flex-flow: row wrap;
     -webkit-justify-content: space-between;
-    
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
 }
-
 footer span {
     -webkit-flex: 1 1 33%;
     flex: 1 1 33%;
 }
-
 #artist {
     text-align: left;
 }
-
 #code {
     text-align: right;
 }
-
-/*----------------------------------------------------------------------------*/
-
 @media(max-width:700px) {
     table {
         padding: 0 32px;
         white-space: nowrap;
         margin: 0 auto;
         width: auto;
-        
         display: -webkit-flex;
         -webkit-flex-flow: row nowrap;
-        
         display: flex;
         flex-flow: row nowrap;
     }
-    
     thead {
         text-align: left;
     }
-    
     tbody {
         text-align: right;
     }
-    
     tr {
         display: -webkit-flex;
         -webkit-flex-flow: column nowrap;
-        
         display: flex;
         flex-flow: column nowrap;
     }
-    
     th, td {
         padding: 0 8px;
     }
-    
     .site {
         font-size: 22px;
         padding: 8px 0;
     }
-    
     #author {
         text-align: right;
         -webkit-flex-grow: 0;
         flex-grow: 0;
     }
-    
     #code {
         -webkit-flex-basis: 100%;
         flex-basis: 100%;
