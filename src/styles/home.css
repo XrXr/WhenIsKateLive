@@ -1,156 +1,197 @@
-/* Author:XrXr
-https://github.com/XrXr/WhenIsKateLive
-License:MIT */
-.center-region {
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    height: 100%;
-    width: 70%;
-    min-height: 767px;
-    max-width: 1024px;
-    min-width: 450px;
-    margin: 0 auto;
-    background-color: #F1EECC;
-    position: absolute;
-    -webkit-border-radius: 15px;
-    -moz-border-radius: 15px;
-    border-radius: 15px;
-    -webkit-box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.75);
-    -moz-box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.75);
-    box-shadow: 0px 0px 30px 0px rgba(50, 50, 50, 0.75)
+/* Author: XrXr
+https: //github.com/XrXr/WhenIsKateLive
+License: MIT */
+
+/*============================================================================*/
+
+* {
+    box-sizing: inherit; /* Allows nested styles to define thier own */
 }
-.soft-hide {
-    opacity: 0;
-    height: 0
-}
-h1, h3, th, td, .about-center, .notice-center {
-    text-align: center
-}
-h1 {
-    margin-top: 20px;
-    margin-bottom: 20px
-}
-h3 {
-    margin-bottom: 0px
-}
-table {
-    width: 100%
-}
-a:hover {
-    text-decoration: none
-}
-body {
-    background-color: pink
-}
-a {
-    pointer-events: all
-}
-.overlay-block {
-    width: 100%;
-    height: 60%;
-    max-width: 1024px;
-    background-image: url(../assets/overlay.png);
-    background-position: center 0;
-    background-repeat: no-repeat
-}
-.about-blcok {
-    position: absolute;
-    left: 10px;
-    width: calc(100% - 10px);
-    bottom: 0px
-}
-.about-block-element {
-    pointer-events: none;
-    position: absolute;
-    bottom: 0;
-    width: inherit
-}
-.about-right {
-    text-align: right
-}
-@media (max-width:894px) {
-    .about-blcok {
-        display: none
-    }
-}
-.twitter-username, .twitch-username, .youtube-username {
+
+html {
+    background-color: #ffc1ca;
+    padding: 16px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #333;
-    font-size: 40px;
-    line-height: 1
+    overflow-x: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
+    height: 100%;
 }
-.twitter-username::before {
-    content: "@lovelykaitkim"
+
+body {
+    max-width: 1024px;
+    margin: 0 auto;
+    background: #f1eecc;
+    border-radius: 8px;
+    box-shadow: 0px 0px 16px rgba( 50, 50, 50, 0.75 );
+    text-align: center;
+    min-height: 100%;
+    
+    display: -webkit-flex;
+    -webkit-flex-flow: column nowrap;
+    
+    display: flex;
+    flex-flow: column nowrap;
 }
-.twitch-username::before {
-    content: "LovelyMomo"
+
+/*----------------------------------------------------------------------------*/
+
+h3 {
+    font-size: 24px;
+    font-weight: 500;
+    padding-top: 16px;
+    margin: 0;
 }
-.youtube-username::before {
-    content: "ProBoxStudio"
+
+.hidden {
+    display: none;
 }
-.twitch-block, .youtube-block, .twitter-block {
+
+h1 {
+    font-size: 36px;
+    font-weight: 500;
+    padding: 0 16px;
+}
+
+small {
+    font-size: 12px;
+}
+
+table {
+    font-size: 14px;
+    width: 100%;
+}
+
+a {
+    color: #428bca;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #2a6496;
+}
+
+a.disguise {
     color: inherit;
+}
+
+.art {
+    width: 100%;
+    height: auto;
+}
+
+nav {
+    display: -webkit-flex;
+    -webkit-flex-grow: 1;
+    -webkit-flex-flow: row wrap;
+    -webkit-align-items: stretch;
+    -webkit-align-content: flex-start;
+    -webkit-justify-content: space-around;
+    
+    display: flex;
+    flex-grow: 1;
+    flex-flow: row wrap;
+    align-items: stretch;
+    align-content: flex-start;
+    justify-content: space-around;
+}
+
+.site {
     display: inline-block;
-    position: relative;
-    margin-left: 50px;
-    margin-top: 25px;
-    margin-bottom: 25px;
-    float: left
+    text-decoration: none;
+    font-size: 40px;
+    padding: 16px 0;
+    margin: 0 16px;
 }
-.prefix {
-    color: #333 !important;
-    cursor: default
+
+.site img {
+    width: auto;
+    height: 0.9em; /* 9/10 of local text size */
+    vertical-align: middle;
 }
-.disguise {
-    text-decoration: none !important
+
+.site .name {
+    color: #333;
+    padding-left: 8px;
+    vertical-align: middle;
 }
-.disguise:focus {
-    outline: 0
+
+footer {
+    padding: 8px 16px;
+    font-size: 14px;
+    
+    display: -webkit-flex;
+    -webkit-flex-flow: row wrap;
+    -webkit-justify-content: space-between;
+    
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
 }
-.disguise:hover {
-    color: inherit;
-    text-decoration: none
+
+footer span {
+    -webkit-flex: 1 1 33%;
+    flex: 1 1 33%;
 }
-.twitch-logo, .youtube-logo, .twitter-logo {
-    position: relative;
-    width: 45px;
-    height: 45px;
-    float: left
+
+#artist {
+    text-align: left;
 }
-.twitter-block {
-    top: 0;
-    left: 0;
-    margin-left: 10px;
-    float: left
+
+#code {
+    text-align: right;
 }
-.twitter-logo {
-    top: 5px
-}
-.youtube-logo {
-    top: 3px
-}
-.youtube-username {
-    margin-left: 10px
-}
-@media (max-width:1430px) {
-    .twitter-username::before {
-        content: ""
+
+/*----------------------------------------------------------------------------*/
+
+@media(max-width:700px) {
+    table {
+        padding: 0 32px;
+        white-space: nowrap;
+        margin: 0 auto;
+        width: auto;
+        
+        display: -webkit-flex;
+        -webkit-flex-flow: row nowrap;
+        
+        display: flex;
+        flex-flow: row nowrap;
     }
-    .twitch-username::before {
-        content: ""
+    
+    thead {
+        text-align: left;
     }
-    .youtube-username::before {
-        content: ""
+    
+    tbody {
+        text-align: right;
     }
-    .twitch-block {
-        position: absolute;
-        left: calc(50% - 22.5px);
-        margin-left: 0;
-        margin-right: 0
+    
+    tr {
+        display: -webkit-flex;
+        -webkit-flex-flow: column nowrap;
+        
+        display: flex;
+        flex-flow: column nowrap;
     }
-    .youtube-block {
-        right: 0px;
-        position: absolute
+    
+    th, td {
+        padding: 0 8px;
+    }
+    
+    .site {
+        font-size: 22px;
+        padding: 8px 0;
+    }
+    
+    #author {
+        text-align: right;
+        -webkit-flex-grow: 0;
+        flex-grow: 0;
+    }
+    
+    #code {
+        -webkit-flex-basis: 100%;
+        flex-basis: 100%;
     }
 }
