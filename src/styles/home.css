@@ -130,6 +130,19 @@ footer {
     justify-content: space-between;
 }
 
+footer span {
+    -webkit-flex: 1 1 33%;
+    flex: 1 1 33%;
+}
+
+#artist {
+    text-align: left;
+}
+
+#code {
+    text-align: right;
+}
+
 /*----------------------------------------------------------------------------*/
 
 @media(max-width:700px) {
@@ -169,5 +182,16 @@ footer {
     .site {
         font-size: 22px;
         padding: 8px 0;
+    }
+    
+    #author {
+        text-align: right;
+        -webkit-flex-grow: 0;
+        flex-grow: 0;
+    }
+    
+    #code {
+        -webkit-flex-basis: 100%;
+        flex-basis: 100%;
     }
 }
