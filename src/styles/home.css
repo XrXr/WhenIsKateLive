@@ -66,6 +66,10 @@ a:hover {
     color: #2a6496;
 }
 
+a.disguise {
+    color: inherit;
+}
+
 .art {
     width: 100%;
     height: auto;
