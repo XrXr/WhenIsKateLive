@@ -9,7 +9,6 @@ This is a web page that contains the following
 This is inspired by [whenisnlss.com](http://whenisnlss.com/) and made at the request of this [Reddit post]
 
 ##Libraries used
- - BootStrap css (through cdn)
  - Moment.js (served with project)
 
 ##Building
