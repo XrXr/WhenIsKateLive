@@ -1,0 +1,15 @@
+{
+    "name": "when-is-kate-live",
+    "version": "0.0.10",
+    "scripts": {
+        "build": "node ./build_tools/build.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/XrXr/WhenIsKateLive"
+    },
+    "dependencies": {
+        "clean-css": "2.2.13",
+        "shelljs": "0.3.0"
+    }
+}

@@ -9,24 +9,41 @@ This is a web page that contains the following
 This is inspired by [whenisnlss.com](http://whenisnlss.com/) and made at the request of this [Reddit post]
 
 ##Libraries used
- - Moment.js (served with project)
+ - [Moment.js]() (served with project)
 
 ##Building
-On the [live page] minified version of libraries are used. The scripts belonging to this project uses [Closure Compiler]
-for minification.
+The project uses [Closure Compiler] for JavaScript minification and [clean-css] for css minification.
+
+#####To set up build environment:
+1. Make sure `java` and `npm` are in `path`
+2. Put a copy of `compiler.jar` into `./build_tools`
+3. Run `npm install ./` at the root of the repo
+
+#####To build:
+`npm run build`
+
+This will create a directory `build` that contains the minified script and css. The root of `build` correspond to the
+repo root.
 
 ##Testing
 Tests are written with mocha and Chai
 
 ##License
-[MIT](LICENSE.txt) for non-vender code.
+[MIT](LICENSE.txt)
+
 If you use part(s) of the project somehow, let me know! (You don't have to)
 
 ##Browser support
 Haphazardly tested on Firefox 30 and Google Chrome 35. Mostly functional on IE 11.
-There are no plans to support any version of IE
+
+There is no plan to support any version of IE
+
+####Mobile
+Thanks to Alexander-Prime's work(#5) The page supports mobile browsers!
 
 [Reddit post]: http://www.reddit.com/r/KateArmy/comments/2a8gna/can_we_get_something_like_whenisnlsscom/
 [live page]: http://xrxr.github.io/WhenIsKateLive/
 [Kate Live]: http://www.twitch.tv/lovelymomo
 [Closure Compiler]: https://developers.google.com/closure/compiler/
+[clean-css]: https://www.npmjs.org/package/clean-css
+[Moment.js]: http://momentjs.com/
