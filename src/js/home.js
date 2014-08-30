@@ -1,15 +1,16 @@
 // Author: XrXr
 // https://github.com/XrXr/WhenIsKateLive
 // License: MIT
-(function(){
+(function() {
     "use strict";
     // is the streamer observing DST?
     var streamer_dst = moment().tz("america/vancouver").isDST();
     var visitor_timezone_offset = (new Date()).getTimezoneOffset();
-    var streams = (function(){
-        var weekday_names = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    var streams = (function() {
+        var weekday_names = ["monday", "tuesday", "wednesday", "thursday",
+                             "friday", "saturday", "sunday"];
         function iso_to_eng (num) {
-            if (num < 1 || num > 7 || !Number.isInteger(num)){
+            if (num < 1 || num > 7 || !Number.isInteger(num)) {
                 throw new Error("Invalid iso day of week");
             }
             return weekday_names[num - 1];
@@ -18,7 +19,7 @@
         function eng_to_iso (name) {
             var lowered = name.toLowerCase();
             var index = weekday_names.indexOf(lowered);
-            if (index === -1){
+            if (index === -1) {
                 throw new Error("Invalid weekday name");
             }
             return index + 1;
@@ -26,7 +27,7 @@
 
         function TimeSlot(weekday_name, start, duration) {
             // This object makes schedule entries readable
-            if (!(this instanceof TimeSlot)){
+            if (!(this instanceof TimeSlot)) {
                 return new TimeSlot(weekday_name, start, duration);
             }
             this.start = start;
@@ -35,16 +36,19 @@
         }
         // its probably better to construct these in less steps
         // however this is much more readable;
-        var SCHEDULE = [TimeSlot("Monday", "11:00 AM", 3),
-                        TimeSlot("Tuesday", "11:00 AM", 2),
-                        TimeSlot("Wednesday", "11:00 AM", 2),
+        var SCHEDULE = [TimeSlot("Monday",    "11:00 AM", 3),
+                        TimeSlot("Monday",    "6:00 PM", 2),
+                        TimeSlot("Tuesday",   "11:00 AM", 5),
+                        TimeSlot("Wednesday", "11:00 AM", 3),
+                        TimeSlot("Thursday",  "12:00 AM", 2),
                         TimeSlot("Thursday",  "10:00 PM", 2),
-                        TimeSlot("Saturday",  "8:00  PM", 3),
-                        TimeSlot("Sunday",    "11:00 AM", 2)];
+                        TimeSlot("Friday",    "4:00 PM", 3),
+                        TimeSlot("Saturday",  "4:00 PM", 3),
+                        TimeSlot("Sunday",    "11:00 AM", 3)];
 
         function Stream(start_time, duration) {
             // new Stream() and Stream() both work
-            if (!(this instanceof Stream)){
+            if (!(this instanceof Stream)) {
                 return new Stream(start_time, duration);
             }
             this.start = start_time.clone().zone(visitor_timezone_offset);
@@ -52,32 +56,35 @@
             this.end.add('hours', duration);
             this.duration = duration;
             // normalized to the start of the iso week
-            this.start_normalized = this.start.unix() - this.start.clone().startOf("isoWeek").unix();
-            this.end_normalized = this.end.unix() - this.end.clone().startOf("isoWeek").unix();
+            this.start_normalized = this.start.unix() -
+                                    this.start.clone().
+                                    startOf("isoWeek").unix();
+            this.end_normalized = this.end.unix() -
+                                  this.end.clone().startOf("isoWeek").unix();
         }
 
         function get_base_format (moment_instance) {
-            if (moment_instance.minutes() > 0){
+            if (moment_instance.minutes() > 0) {
                 return ["h:m", "a"];
             }
             return ["h", "a"];
         }
 
-        Stream.prototype.toString = function(){
+        Stream.prototype.toString = function() {
             var start_signature = this.start.format("a");
             var end_signature = this.end.format("a");
 
             var start_format = get_base_format(this.start);
             var end_format = get_base_format(this.end);
 
-            if (start_signature === end_signature){
+            if (start_signature === end_signature) {
                 start_format.pop();
             }
             return this.start.format(start_format.join(" ")) +
                 " to " + this.end.format(end_format.join(" "));
         };
 
-        Stream.prototype.is_live = function(since_week_start){
+        Stream.prototype.is_live = function(since_week_start) {
             // in seconds
             return since_week_start >= this.start_normalized &&
                    since_week_start <= this.end_normalized;
@@ -88,12 +95,13 @@
         var format = "h:m a Z E WW YYYY";
 
         function make_stream (time_slot) {
-            return new Stream(moment(time_slot.start + " " + timezone_suffix +
-                                        " " + time_slot.isoWeekday + " " + "1" + " 1970", format),
-                                    time_slot.duration);
+            return new Stream(moment(
+                    time_slot.start + " " + timezone_suffix + " " +
+                    time_slot.isoWeekday + " " + "1" + " 1970", format),
+                time_slot.duration);
         }
 
-        if (window.export_internals){
+        if (window.export_internals) {
             window.streamer_dst = streamer_dst;
             window.visitor_timezone_offset = visitor_timezone_offset;
             window.TimeSlot = TimeSlot;
@@ -108,23 +116,23 @@
         // if no such Stream exist, return the Stream with;
         // the closest start time that is in the future
         var found;
-        streams.some(function(stream, index){
-            if (since_week_start > stream.end_normalized){
+        streams.some(function(stream, index) {
+            if (since_week_start > stream.end_normalized) {
                 return false;  // continue
             }
             found = stream;
             return true; // break
         });
-        if (!found){
+        if (!found) {
             return streams[0];
         }
         return found;
     }
 
-    var get_countdown = (function(){
+    var get_countdown = (function() {
         function pluralize (integer, string) {
             var base = integer + " " + string;
-            if (integer > 1){
+            if (integer > 1) {
                 return base + 's';
             }
             return base;
@@ -137,16 +145,16 @@
             var minutes = duration.minutes();
             var seconds = duration.seconds();
             var result = [];
-            if (days){
+            if (days) {
                 result.push(pluralize(days, 'day'));
             }
-            if (hours){
+            if (hours) {
                 result.push(pluralize(hours, 'hour'));
             }
-            if (minutes){
+            if (minutes) {
                 result.push(pluralize(minutes, 'minute'));
             }
-            if (seconds){
+            if (seconds) {
                 result.push(pluralize(seconds, 'second'));
             }
             return result.join(", ");
@@ -156,10 +164,10 @@
         function get_countdown (now, target) {
             // in seconds
             var delta = target - now;
-            if (delta > 0){
+            if (delta > 0) {
                 return format_countdown(delta);
             }
-            if (delta < 0){
+            if (delta < 0) {
                 return format_countdown(target + a_week - now);
             }
             // this should never happen. See tick()
@@ -168,7 +176,7 @@
         return get_countdown;
     })();
 
-    var update_dom = (function(){
+    var update_dom = (function() {
         function find (selector) {
             return document.querySelector(selector);
         }
@@ -179,38 +187,90 @@
         }
 
         function add_class (node, name) {
-            if (node.className === ""){
+            if (node.className === "") {
                 node.className += " " + name;
             }
         }
 
         function remove_class (node, name) {
-            if (!node.className){
+            if (!node.className) {
                 return;
             }
-            if (node.className.match(get_regex(name)).length > 0){
+            if (node.className.match(get_regex(name)).length > 0) {
                 node.className = node.className.replace(get_regex(name), '');
             }
         }
 
-        var trs = document.querySelectorAll('tr');
-        var head_tr = trs[0];
-        while (head_tr.children.length < streams.length){
+        var sorted = [];
+        var max_same_day = 0;
+        var processed = {};
+        for (var i = 0; i < streams.length; i++) {
+            if (i in processed) {
+                continue;
+            }
+            processed[i] = 0;
+            var current = streams[i];
+            var days = [current];
+            var day = current.start.isoWeekday();
+            var week = current.start.isoWeek();
+            var year = current.start.year();
+            for (var j = 0; j < streams.length; j++) {
+                if (j in processed) {
+                    continue;
+                }
+                if (streams[j].start.isoWeekday() == day &&
+                    streams[j].start.isoWeek() == week &&
+                    streams[j].start.year() == year) {
+                    days.push(streams[j]);
+                    processed[j] = 0;
+                }
+            }
+            if (days.length > max_same_day) {
+                max_same_day = days.length;
+            }
+            sorted.push(days);
+        }
+
+        var head_tr = document.querySelector('tr');
+        while (head_tr.children.length < streams.length) {
             head_tr.appendChild(document.createElement("th"));
         }
-        for (var i = 0; i < streams.length; i++) {
-            head_tr.children[i].textContent = streams[i].start.format("dddd");
+        for (var i = 0; i < sorted.length; i++) {
+            head_tr.children[i].textContent = sorted[i][0].start.format("dddd");
         }
 
-        var body_tr = trs[1];
-        while (body_tr.children.length < streams.length){
-            body_tr.appendChild(document.createElement("td"));
+        var body = document.querySelector("tbody");
+        while (body.children.length < max_same_day) {
+            body.appendChild(document.createElement("tr"));
         }
-        for (var i = 0; i < streams.length; i++) {
-            body_tr.children[i].textContent = streams[i].toString();
+        for (var i = 0; i < body.children.length; i++) {
+            var current_tr = body.children[i];
+            while (current_tr.children.length < sorted.length) {
+                current_tr.appendChild(document.createElement("td"));
+            }
+            if (i != 0) {
+                current_tr.className = "auxiliary-slots";
+            }
+        }
+        for (var i = 0; i < sorted.length; i++) {
+            for (var j = 0; j < sorted[i].length; j++) {
+                body.children[j].children[i].textContent =
+                    sorted[i][j].toString();
+            }
         }
 
-        find("small").textContent = "All times are converted to your local time";
+        for (var i = 0; i < sorted.length; i++) {
+            for (var j = 1; j < sorted[i].length; j++) {
+                console.log("cats");
+                var same_line_element = document.createElement("span");
+                same_line_element.className = "same-line-slots";
+                same_line_element.textContent = ", " + sorted[i][j].toString();
+                body.children[0].children[i].appendChild(same_line_element);
+            }
+        }
+
+        find("small").textContent =
+            "All times are converted to your local time";
 
         var prefix = find("h3");
         var countdown = find("h1").children[0];
@@ -219,10 +279,11 @@
 
         function update_dom (live, countdown_string) {
             // second argument is ignored if live is true
-            if (live){
+            if (live) {
                 add_class(prefix, hide_class);
                 remove_class(countdown, clock);
-                countdown.textContent = "Kate is live right now! Click to watch";
+                countdown.textContent =
+                    "Kate is live right now! Click to watch";
                 countdown.href = "http://www.twitch.tv/lovelymomo";
                 return;
             }
@@ -248,20 +309,21 @@
         var now_unix = now.unix();
         var since_week_start = now_unix - now.clone().startOf("isoWeek").unix();
         var is_live = stream.is_live(since_week_start);
-        if (is_live){
+        if (is_live) {
             last_check = true;
             return update_dom(true);
         }
         // TODO: this could be: check if now is after stream.end
-        if (last_check){
+        if (last_check) {
             last_check = false;
             stream = find_next_stream(streams, since_week_start);
             return tick();
         }
         last_check = false;
-        return update_dom(false, get_countdown(since_week_start, stream.start_normalized));
+        return update_dom(false, get_countdown(since_week_start,
+                                               stream.start_normalized));
     }
-    if (window.export_internals){
+    if (window.export_internals) {
         window.get_countdown = get_countdown;
         window.streams = streams;
         window.find_next_stream = find_next_stream;

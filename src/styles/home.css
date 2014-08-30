@@ -115,6 +115,9 @@ footer span {
 #code {
     text-align: right;
 }
+.same-line-slots {
+    display: none;
+}
 @media(max-width:700px) {
     table {
         padding: 0 32px;
@@ -154,5 +157,11 @@ footer span {
     #code {
         -webkit-flex-basis: 100%;
         flex-basis: 100%;
+    }
+    .auxiliary-slots {
+        display: none;
+    }
+    .same-line-slots {
+        display: inline;
     }
 }
