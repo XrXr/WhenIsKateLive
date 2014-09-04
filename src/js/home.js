@@ -40,7 +40,7 @@
                         TimeSlot("Monday",    "6:00 PM", 2),
                         TimeSlot("Tuesday",   "11:00 AM", 5),
                         TimeSlot("Wednesday", "11:00 AM", 3),
-                        TimeSlot("Thursday",  "12:00 AM", 2),
+                        TimeSlot("Thursday",  "12:00 PM", 2),
                         TimeSlot("Thursday",  "10:00 PM", 2),
                         TimeSlot("Friday",    "4:00 PM", 3),
                         TimeSlot("Saturday",  "4:00 PM", 3),
