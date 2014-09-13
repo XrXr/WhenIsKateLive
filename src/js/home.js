@@ -36,13 +36,13 @@
         }
         // its probably better to construct these in less steps
         // however this is much more readable;
-        var SCHEDULE = [TimeSlot("Monday",    "11:00 AM", 3),
+        var SCHEDULE = [TimeSlot("Monday",    "11:00 AM", 4),
                         TimeSlot("Monday",    "6:00 PM", 2),
                         TimeSlot("Tuesday",   "11:00 AM", 5),
-                        TimeSlot("Wednesday", "11:00 AM", 3),
-                        TimeSlot("Thursday",  "12:00 PM", 2),
+                        TimeSlot("Wednesday", "11:00 AM", 4),
+                        TimeSlot("Thursday",  "11:00 AM", 4),
                         TimeSlot("Thursday",  "10:00 PM", 2),
-                        TimeSlot("Friday",    "4:00 PM", 3),
+                        TimeSlot("Friday",    "2:00 PM", 5),
                         TimeSlot("Saturday",  "4:00 PM", 3),
                         TimeSlot("Sunday",    "11:00 AM", 3)];
 
