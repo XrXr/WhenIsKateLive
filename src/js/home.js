@@ -41,9 +41,9 @@
                         TimeSlot("Tuesday",   "11:00 AM", 5),
                         TimeSlot("Wednesday", "11:00 AM", 4),
                         TimeSlot("Thursday",  "11:00 AM", 4),
-                        TimeSlot("Thursday",  "10:00 PM", 2),
-                        TimeSlot("Friday",    "2:00 PM", 5),
-                        TimeSlot("Saturday",  "4:00 PM", 3),
+                        TimeSlot("Thursday",  "9:00 PM", 2),
+                        TimeSlot("Friday",    "11:00 AM", 5),
+                        TimeSlot("Saturday",  "3:00 PM", 3),
                         TimeSlot("Sunday",    "11:00 AM", 3)];
 
         function Stream(start_time, duration) {
