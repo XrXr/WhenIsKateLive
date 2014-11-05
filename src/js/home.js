@@ -4,6 +4,8 @@
 (function() {
     "use strict";
     // is the streamer observing DST?
+    var an_hour = 3600;
+    var a_week = 604800;
     var streamer_dst = moment().tz("america/vancouver").isDST();
     var visitor_timezone_offset = (new Date()).getTimezoneOffset();
     var streams = (function() {
@@ -159,7 +161,6 @@
             return result.join(", ");
         }
 
-        var a_week = 604800;
         function get_countdown (now, target) {
             // in seconds
             var delta = target - now;
@@ -307,6 +308,14 @@
         var now = moment();
         var now_unix = now.unix();
         var since_week_start = now_unix - now.clone().startOf("isoWeek").unix();
+        var since_day_start = now_unix - now.clone().startOf("day").unix();
+        // this will be non-zero on the days that the DST adjustment happens.
+        // On the day DST ends, the elapsed time at the end of the day is 25
+        // hours. On the day DST starts, it's 23 hours.
+        var observed_difference = now.hour() -
+            Math.floor(since_day_start / an_hour);
+        since_week_start += observed_difference * an_hour;
+
         var is_live = stream.is_live(since_week_start);
         if (is_live) {
             last_check = true;
