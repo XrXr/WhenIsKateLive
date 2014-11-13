@@ -163,15 +163,15 @@
 
         function get_countdown (now, target) {
             // in seconds
+            if (now === target) {  // this should never happen. See tick()
+                throw new Error(
+                    "get_countdown() called with invalid arguments");
+            }
             var delta = target - now;
-            if (delta > 0) {
-                return format_countdown(delta);
-            }
             if (delta < 0) {
-                return format_countdown(target + a_week - now);
+                delta += a_week;
             }
-            // this should never happen. See tick()
-            throw new Error("get_countdown() called with invalid arguments");
+            return format_countdown(delta);
         }
         return get_countdown;
     })();
@@ -201,7 +201,9 @@
             }
         }
 
-        var sorted = [];
+        // this will be [[Stream]], the streams that are in the same array start
+        // on the same day
+        var grouped = [];
         var max_same_day = 0;
         var processed = {};
         for (var i = 0; i < streams.length; i++) {
@@ -210,7 +212,7 @@
             }
             processed[i] = 0;
             var current = streams[i];
-            var days = [current];
+            var current_day = [current];
             var day = current.start.isoWeekday();
             var week = current.start.isoWeek();
             var year = current.start.year();
@@ -221,22 +223,22 @@
                 if (streams[j].start.isoWeekday() == day &&
                     streams[j].start.isoWeek() == week &&
                     streams[j].start.year() == year) {
-                    days.push(streams[j]);
+                    current_day.push(streams[j]);
                     processed[j] = 0;
                 }
             }
-            if (days.length > max_same_day) {
-                max_same_day = days.length;
+            if (current_day.length > max_same_day) {
+                max_same_day = current_day.length;
             }
-            sorted.push(days);
+            grouped.push(current_day);
         }
 
         var head_tr = document.querySelector('tr');
-        while (head_tr.children.length < streams.length) {
+        while (head_tr.children.length < grouped.length) {
             head_tr.appendChild(document.createElement("th"));
         }
-        for (var i = 0; i < sorted.length; i++) {
-            head_tr.children[i].textContent = sorted[i][0].start.format("dddd");
+        for (var i = 0; i < grouped.length; i++) {
+            head_tr.children[i].textContent = grouped[i][0].start.format("dddd");
         }
 
         var body = document.querySelector("tbody");
@@ -245,27 +247,23 @@
         }
         for (var i = 0; i < body.children.length; i++) {
             var current_tr = body.children[i];
-            while (current_tr.children.length < sorted.length) {
+            while (current_tr.children.length < grouped.length) {
                 current_tr.appendChild(document.createElement("td"));
             }
-            if (i != 0) {
+            if (i !== 0) {
                 current_tr.className = "auxiliary-slots";
             }
         }
-        for (var i = 0; i < sorted.length; i++) {
-            for (var j = 0; j < sorted[i].length; j++) {
+        for (var i = 0; i < grouped.length; i++) {
+            for (var j = 0; j < grouped[i].length; j++) {
                 body.children[j].children[i].textContent =
-                    sorted[i][j].toString();
-            }
-        }
-
-        for (var i = 0; i < sorted.length; i++) {
-            for (var j = 1; j < sorted[i].length; j++) {
-                console.log("cats");
-                var same_line_element = document.createElement("span");
-                same_line_element.className = "same-line-slots";
-                same_line_element.textContent = ", " + sorted[i][j].toString();
-                body.children[0].children[i].appendChild(same_line_element);
+                    grouped[i][j].toString();
+                if (j >= 1) {
+                    var same_line_element = document.createElement("span");
+                    same_line_element.className = "same-line-slots";
+                    same_line_element.textContent = ", " + grouped[i][j].toString();
+                    body.children[0].children[i].appendChild(same_line_element);
+                }
             }
         }
 
