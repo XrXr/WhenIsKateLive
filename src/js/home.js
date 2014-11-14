@@ -6,6 +6,8 @@
     // is the streamer observing DST?
     var an_hour = 3600;
     var a_week = 604800;
+    var black = "#333";
+    var grey = "grey";
     var streamer_dst = moment().tz("america/vancouver").isDST();
     var visitor_timezone_offset = (new Date()).getTimezoneOffset();
     var streams = (function() {
@@ -36,8 +38,8 @@
             this.isoWeekday = eng_to_iso(weekday_name);
             this.duration = duration;
         }
-        // its probably better to construct these in less steps
-        // however this is much more readable;
+        // its probably better to construct these in less steps however this is
+        // much more readable. This *must* be in sorted order
         var SCHEDULE = [TimeSlot("Monday",    "12:00 PM", 3),
                         TimeSlot("Monday",    "6:00 PM", 2),
                         TimeSlot("Tuesday",   "12:00 PM", 3),
@@ -62,6 +64,7 @@
                                     startOf("isoWeek").unix();
             this.end_normalized = this.end.unix() -
                                   this.end.clone().startOf("isoWeek").unix();
+            this.dom_elements = [];
         }
 
         function get_base_format (moment_instance) {
@@ -238,7 +241,10 @@
             head_tr.appendChild(document.createElement("th"));
         }
         for (var i = 0; i < grouped.length; i++) {
-            head_tr.children[i].textContent = grouped[i][0].start.format("dddd");
+            head_tr.children[i].textContent =
+                grouped[i][0].start.format("dddd");
+            // save reference to elements for highlighting later
+            grouped[i][0].dom_elements.push(head_tr.children[i]);
         }
 
         var body = document.querySelector("tbody");
@@ -258,10 +264,14 @@
             for (var j = 0; j < grouped[i].length; j++) {
                 body.children[j].children[i].textContent =
                     grouped[i][j].toString();
+                // save reference to elements for highlighting later
+                grouped[i][j].dom_elements.push(body.children[j].children[i]);
                 if (j >= 1) {
                     var same_line_element = document.createElement("span");
                     same_line_element.className = "same-line-slots";
-                    same_line_element.textContent = ", " + grouped[i][j].toString();
+                    same_line_element.textContent =
+                        ", " + grouped[i][j].toString();
+                    // this is for the mobile view, thus body.children[0]
                     body.children[0].children[i].appendChild(same_line_element);
                 }
             }
@@ -293,8 +303,37 @@
         return update_dom;
     })();
 
+    // highlight all the streams that starts on `today`. `today` is an integer
+    // with Sunday as 0 and Saturday as 6. If no stream is happening on `today`
+    // highlight all streams that starts on the same day of `next_stream`
+    function highlight_today(today, next_stream) {
+        var found = false;
+        for (var i = 0; i < streams.length; i++) {
+            for (var j = 0; j < streams[i].dom_elements.length; j++) {
+                if (streams[i].start.day() === today) {
+                    streams[i].dom_elements[j].style.color = black;
+                    found = true;
+                } else {
+                    streams[i].dom_elements[j].style.color = grey;
+                }
+            }
+        }
+        if (!found) {
+            var target_day = next_stream.start.day();
+            for (var i = 0; i < streams.length; i++) {
+                if (streams[i].start.day() === target_day) {
+                    for (var j = 0; j < streams[i].dom_elements.length; j++) {
+                        streams[i].dom_elements[j].style.color = black;
+                    }
+                }
+            }
+        }
+    }
+
     var stream = streams[0];
+    // this flag indicates wheter a stream was live in the last check
     var last_check = true;
+    var day_of_week = -1;  // trigger a highlight
     // TODO: this needs better implementation
     // countdown dom update should be in the fastest lane
     function tick() {
@@ -307,6 +346,11 @@
         var now_unix = now.unix();
         var since_week_start = now_unix - now.clone().startOf("isoWeek").unix();
         var since_day_start = now_unix - now.clone().startOf("day").unix();
+        var new_day_of_week = now.day();
+        if (new_day_of_week !== day_of_week) {
+            highlight_today(new_day_of_week, stream);
+        }
+        day_of_week = new_day_of_week;
         // this will be non-zero on the days that the DST adjustment happens.
         // On the day DST ends, the elapsed time at the end of the day is 25
         // hours. On the day DST starts, it's 23 hours.
@@ -323,6 +367,7 @@
         if (last_check) {
             last_check = false;
             stream = find_next_stream(streams, since_week_start);
+            highlight_today(new_day_of_week, stream);  // stream is changed
             return tick();
         }
         last_check = false;
