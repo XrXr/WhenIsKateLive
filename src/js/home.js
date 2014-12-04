@@ -42,7 +42,6 @@
         // much more readable. This *must* be in sorted order
         var SCHEDULE = [TimeSlot("Monday",    "12:00 PM", 3),
                         TimeSlot("Monday",    "6:00 PM", 2),
-                        TimeSlot("Tuesday",   "12:00 PM", 3),
                         TimeSlot("Wednesday", "6:00 PM", 2),
                         TimeSlot("Friday",    "12:00 PM", 3),
                         TimeSlot("Saturday",  "3:00 PM", 3),
