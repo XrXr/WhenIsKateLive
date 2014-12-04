@@ -43,6 +43,7 @@
         var SCHEDULE = [TimeSlot("Monday",    "12:00 PM", 3),
                         TimeSlot("Monday",    "6:00 PM", 2),
                         TimeSlot("Wednesday", "6:00 PM", 2),
+                        TimeSlot("Thursday",  "9:00 PM", 2),
                         TimeSlot("Friday",    "12:00 PM", 3),
                         TimeSlot("Saturday",  "3:00 PM", 3),
                         TimeSlot("Sunday",    "11:00 AM", 3)];
