@@ -13,6 +13,7 @@ html {
     max-width: 100%;
     box-sizing: border-box;
     height: 100%;
+    min-width: 351px;
 }
 body {
     max-width: 1024px;
@@ -99,11 +100,11 @@ footer {
     padding: 8px 16px;
     font-size: 14px;
     display: -webkit-flex;
-    -webkit-flex-flow: row wrap;
-    -webkit-justify-content: space-between;
+    -webkit-flex-flow: row nowrap;
+    -webkit-justify-content: center;
     display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
+    flex-flow: row nowrap;
+    justify-content: center;
 }
 footer span {
     -webkit-flex: 1 1 33%;
@@ -149,14 +150,8 @@ footer span {
         font-size: 22px;
         padding: 8px 0;
     }
-    #author {
-        text-align: right;
-        -webkit-flex-grow: 0;
-        flex-grow: 0;
-    }
-    #code {
-        -webkit-flex-basis: 100%;
-        flex-basis: 100%;
+    .hide-on-mobile {
+        display: none;
     }
     .auxiliary-slots {
         display: none;
