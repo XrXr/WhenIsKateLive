@@ -6,23 +6,30 @@ License:MIT */
 }
 html {
     background-color: #ffc1ca;
-    padding: 16px;
+    padding: 0 16px;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #333;
-    overflow-x: hidden;
     max-width: 100%;
     box-sizing: border-box;
     height: 100%;
-    min-width: 351px;
 }
 body {
+    margin: 0;
+    display: table;
+    height: 100%;
+    width: 100%;
+}
+.content-box {
+    display: table-cell;
+    vertical-align: middle;
+}
+.content {
     max-width: 1024px;
-    margin: 0 auto;
+    margin: 16px auto;
     background: #f1eecc;
     border-radius: 8px;
-    box-shadow: 0px 0px 16px rgba( 50, 50, 50, 0.75 );
+    box-shadow: 0px 0px 16px rgba(50, 50, 50, 0.75);
     text-align: center;
-    min-height: 100%;
     display: -webkit-flex;
     -webkit-flex-flow: column nowrap;
     display: flex;
@@ -118,15 +125,20 @@ footer span {
     display: none;
 }
 .twitter {
-    font-size: 27px;
+    font-size: 32px;
 }
 .twitch {
-    font-size: 37px;
+    font-size: 35px;
 }
 .youtube {
-    font-size: 30px;
+    font-size: 35px;
 }
-@media(max-width:700px) {
+@media(max-width: 350px) {
+    html {
+        padding: 0;
+    }
+}
+@media(max-width: 700px) {
     table {
         padding: 0 32px;
         white-space: nowrap;
