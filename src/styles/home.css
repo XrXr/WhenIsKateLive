@@ -67,16 +67,14 @@ a.disguise {
 }
 nav {
     display: -webkit-flex;
-    -webkit-flex-grow: 1;
     -webkit-flex-flow: row wrap;
-    -webkit-align-items: stretch;
-    -webkit-align-content: flex-start;
+    -webkit-align-items: center;
+    -webkit-align-content: center;
     -webkit-justify-content: space-around;
     display: flex;
-    flex-grow: 1;
     flex-flow: row wrap;
-    align-items: stretch;
-    align-content: flex-start;
+    align-items: center;
+    align-content: center;
     justify-content: space-around;
 }
 .site {
@@ -118,6 +116,15 @@ footer span {
 }
 .same-line-slots {
     display: none;
+}
+.twitter {
+    font-size: 27px;
+}
+.twitch {
+    font-size: 37px;
+}
+.youtube {
+    font-size: 30px;
 }
 @media(max-width:700px) {
     table {
