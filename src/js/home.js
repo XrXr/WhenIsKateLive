@@ -22,13 +22,7 @@
         return index + 1;
     }
 
-    function TimeSlot(weekday_name, start, duration) {
-        this.start = start;
-        this.isoWeekday = eng_to_iso(weekday_name);
-        this.duration = duration;
-    }
-
-    // Make an array of Stream objects given an array of TimeSlots
+    // Make an array of Stream objects given an array of time slots
     function make_streams (schedule) {
         function iso_to_eng (num) {
             if (num < 1 || num > 7 || !Number.isInteger(num)) {
@@ -37,7 +31,7 @@
             return weekday_names[num - 1];
         }
 
-        function Stream(start_time, duration) {
+        function Stream(start_time, duration, canceled) {
             this.start = start_time.clone().zone(visitor_timezone_offset);
             this.end = start_time.clone().zone(visitor_timezone_offset);
             this.end.add('hours', duration);
@@ -49,6 +43,7 @@
             this.end_normalized = this.end.unix() -
                                   this.end.clone().startOf("isoWeek").unix();
             this.dom_elements = [];
+            this.canceled = canceled;
         }
 
         function get_base_format (moment_instance) {
@@ -82,27 +77,25 @@
         var timezone_suffix = streamer_dst ? "-0700" : "-0800";
         var format = "h:m a Z E WW YYYY";
 
-        function make_stream (time_slot) {
+        function make_stream (slot) {
             return new Stream(moment(
-                    time_slot.start + " " + timezone_suffix + " " +
-                    time_slot.isoWeekday + " " + "1" + " 1970", format),
-                time_slot.duration);
+                    slot.time + " " + timezone_suffix + " " +
+                    eng_to_iso(slot.weekday) + " " + "1" + " 1970", format),
+                slot.duration, slot.canceled);
         }
 
         if (window.export_internals) {
             window.streamer_dst = streamer_dst;
             window.visitor_timezone_offset = visitor_timezone_offset;
-            window.TimeSlot = TimeSlot;
             window.make_stream = make_stream;
         }
 
         return schedule.map(make_stream);
     }
 
+    // Return a Stream that is currently live. If no such Stream exists,
+    // return the Stream with the closest start time that is in the future
     function find_next_stream (streams, since_week_start) {
-        // return a Stream that is currently live
-        // if no such Stream exist, return the Stream with;
-        // the closest start time that is in the future
         var found;
         streams.some(function(stream, index) {
             if (since_week_start > stream.end_normalized) {
@@ -318,9 +311,7 @@
                 "please contact the author";
             return;
         }
-        var streams = make_streams(this.response.map(function (e) {
-            return new TimeSlot(e.weekday, e.time, e.duration, e.canceled);
-        }));
+        var streams = make_streams(this.response);
         var update_dom = initialize(streams);
         var stream = streams[0];
         // this flag indicates wheter a stream was live in the last check

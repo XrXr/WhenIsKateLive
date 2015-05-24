@@ -1,6 +1,11 @@
 describe('Totally redundant timezone conversion validations', function() {
     it('should covert to convert properly', function() {
-        var converted = make_stream(new TimeSlot("Thursday", "11:00 PM", 2));
+        var converted = make_stream({
+            weekday: "Thursday",
+            time: "11:00 PM",
+            duration: 2,
+            canceled: false
+        });
         var delta = streamer_dst ? 7 * 60 - window.visitor_timezone_offset :
             8 * 60 - window.visitor_timezone_offset;
         var day = 4;
