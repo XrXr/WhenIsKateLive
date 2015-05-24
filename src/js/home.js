@@ -10,9 +10,26 @@
     var grey = "grey";
     var streamer_dst = moment().tz("america/vancouver").isDST();
     var visitor_timezone_offset = (new Date()).getTimezoneOffset();
-    var streams = (function() {
-        var weekday_names = ["monday", "tuesday", "wednesday", "thursday",
-                             "friday", "saturday", "sunday"];
+    var weekday_names = ["monday", "tuesday", "wednesday", "thursday",
+                         "friday", "saturday", "sunday"];
+
+    function eng_to_iso (name) {
+        var lowered = name.toLowerCase();
+        var index = weekday_names.indexOf(lowered);
+        if (index === -1) {
+            throw new Error("Invalid weekday name");
+        }
+        return index + 1;
+    }
+
+    function TimeSlot(weekday_name, start, duration) {
+        this.start = start;
+        this.isoWeekday = eng_to_iso(weekday_name);
+        this.duration = duration;
+    }
+
+    // Make an array of Stream objects given an array of TimeSlots
+    function make_streams (schedule) {
         function iso_to_eng (num) {
             if (num < 1 || num > 7 || !Number.isInteger(num)) {
                 throw new Error("Invalid iso day of week");
@@ -20,37 +37,7 @@
             return weekday_names[num - 1];
         }
 
-        function eng_to_iso (name) {
-            var lowered = name.toLowerCase();
-            var index = weekday_names.indexOf(lowered);
-            if (index === -1) {
-                throw new Error("Invalid weekday name");
-            }
-            return index + 1;
-        }
-
-        function TimeSlot(weekday_name, start, duration) {
-            // This object makes schedule entries readable
-            if (!(this instanceof TimeSlot)) {
-                return new TimeSlot(weekday_name, start, duration);
-            }
-            this.start = start;
-            this.isoWeekday = eng_to_iso(weekday_name);
-            this.duration = duration;
-        }
-        // its probably better to construct these in less steps however this is
-        // much more readable. This *must* be in sorted order
-        var SCHEDULE = [TimeSlot("Monday",    "6:00 PM", 2),
-                        TimeSlot("Wednesday", "5:00 PM", 2),
-                        TimeSlot("Thursday",  "9:00 PM", 2),
-                        TimeSlot("Saturday",  "3:00 PM", 2),
-                        TimeSlot("Sunday",    "4:00 PM", 2)];
-
         function Stream(start_time, duration) {
-            // new Stream() and Stream() both work
-            if (!(this instanceof Stream)) {
-                return new Stream(start_time, duration);
-            }
             this.start = start_time.clone().zone(visitor_timezone_offset);
             this.end = start_time.clone().zone(visitor_timezone_offset);
             this.end.add('hours', duration);
@@ -109,8 +96,8 @@
             window.make_stream = make_stream;
         }
 
-        return SCHEDULE.map(make_stream);
-    })();
+        return schedule.map(make_stream);
+    }
 
     function find_next_stream (streams, since_week_start) {
         // return a Stream that is currently live
@@ -176,7 +163,9 @@
         return get_countdown;
     })();
 
-    var update_dom = (function() {
+    // populate the dom with schedule info and return a function used for
+    // updating the countdown
+    function initialize (streams) {
         function find (selector) {
             return document.querySelector(selector);
         }
@@ -201,8 +190,8 @@
             }
         }
 
-        // this will be [[Stream]], the streams that are in the same array start
-        // on the same day
+        // this will be [[Stream]], the streams that are in the same array
+        // start on the same day
         var grouped = [];
         var max_same_day = 0;
         var processed = {};
@@ -269,7 +258,8 @@
                     same_line_element.textContent =
                         ", " + grouped[i][j].toString();
                     // this is for the mobile view, thus body.children[0]
-                    body.children[0].children[i].appendChild(same_line_element);
+                    body.children[0].children[i].appendChild(
+                        same_line_element);
                 }
             }
         }
@@ -298,12 +288,12 @@
             countdown.href = "#";
         }
         return update_dom;
-    })();
+    }
 
     // highlight all the streams that starts on `today`. `today` is an integer
     // with Sunday as 0 and Saturday as 6. If no stream is happening on `today`
     // highlight all streams that starts on the same day of `next_stream`
-    function highlight_today(today, next_stream) {
+    function highlight_today(streams, today, next_stream) {
         var found = false;
         for (var i = 0; i < streams.length; i++) {
             for (var j = 0; j < streams[i].dom_elements.length; j++) {
@@ -327,56 +317,69 @@
         }
     }
 
-    var stream = streams[0];
-    // this flag indicates wheter a stream was live in the last check
-    var last_check = true;
-    var day_of_week = -1;  // trigger a highlight
-    // TODO: this needs better implementation
-    // countdown dom update should be in the fastest lane
-    function tick() {
-        // check if the stream currently holding is live
-        // yes -> show dom
-        // no  -> was the last live check yes?
-        //        yes -> change holding stream to the next stream, recursion
-        //         no -> calculate time until start, show dom
-        var now = moment();
-        var now_unix = now.unix();
-        var since_week_start = now_unix - now.clone().startOf("isoWeek").unix();
-        var since_day_start = now_unix - now.clone().startOf("day").unix();
-        var new_day_of_week = now.day();
-        if (new_day_of_week !== day_of_week) {
-            highlight_today(new_day_of_week, stream);
-        }
-        day_of_week = new_day_of_week;
-        // this will be non-zero on the days that the DST adjustment happens.
-        // On the day DST ends, the elapsed time at the end of the day is 25
-        // hours. On the day DST starts, it's 23 hours.
-        var observed_difference = now.hour() -
-            Math.floor(since_day_start / an_hour);
-        since_week_start += observed_difference * an_hour;
-
-        var is_live = stream.is_live(since_week_start);
-        if (is_live) {
-            last_check = true;
-            return update_dom(true);
-        }
-        // TODO: this could be: check if now is after stream.end
-        if (last_check) {
-            last_check = false;
-            stream = find_next_stream(streams, since_week_start);
-            highlight_today(new_day_of_week, stream);  // stream is changed
-            return tick();
-        }
-        last_check = false;
-        return update_dom(false, get_countdown(since_week_start,
-                                               stream.start_normalized));
-    }
-    if (window.export_internals) {
-        window.get_countdown = get_countdown;
-        window.streams = streams;
-        window.find_next_stream = find_next_stream;
-    }
     /********Entry point*********/
-    tick();
-    setInterval(tick, 1000);
+    var get_schedule = new XMLHttpRequest();
+    get_schedule.open("GET", "/schedule.json");
+    get_schedule.responseType = "json";
+    get_schedule.onload = function () {
+        var streams = make_streams(this.response.map(function (e) {
+            return new TimeSlot(e.weekday, e.time, e.duration, e.canceled);
+        }));
+        var update_dom = initialize(streams);
+        var stream = streams[0];
+        // this flag indicates wheter a stream was live in the last check
+        var last_check = true;
+        var day_of_week = -1;  // trigger a highlight
+        // TODO: this needs better implementation
+        // countdown dom update should be in the fastest lane
+        function tick() {
+            // check if the stream currently holding is live
+            // yes -> show dom
+            // no  -> was the last live check yes?
+            //        yes -> change holding stream to the next stream, recurse
+            //         no -> calculate time until start, update dom
+            var now = moment();
+            var now_unix = now.unix();
+            var since_week_start = now_unix -
+                                   now.clone().startOf("isoWeek").unix();
+            var since_day_start = now_unix - now.clone().startOf("day").unix();
+            var new_day_of_week = now.day();
+            if (new_day_of_week !== day_of_week) {
+                highlight_today(streams, new_day_of_week, stream);
+            }
+            day_of_week = new_day_of_week;
+            // this will be non-zero on the days that the DST adjustment
+            // happens. On the day DST ends, the elapsed time at the end of the
+            // day is 25 hours. On the day DST starts, it's 23 hours.
+            var observed_difference = now.hour() -
+                Math.floor(since_day_start / an_hour);
+            since_week_start += observed_difference * an_hour;
+
+            var is_live = stream.is_live(since_week_start);
+            if (is_live) {
+                last_check = true;
+                return update_dom(true);
+            }
+            // TODO: this could be: check if now is after stream.end
+            if (last_check) {
+                last_check = false;
+                stream = find_next_stream(streams, since_week_start);
+                // stream is changed
+                highlight_today(streams, new_day_of_week, stream);
+                return tick();
+            }
+            last_check = false;
+            return update_dom(false, get_countdown(since_week_start,
+                                                   stream.start_normalized));
+        }
+        if (window.export_internals) {
+            window.get_countdown = get_countdown;
+            window.streams = streams;
+            window.find_next_stream = find_next_stream;
+            window.setTimeout(window.internal_exported, 0);
+        }
+        tick();
+        setInterval(tick, 1000);
+    };
+    get_schedule.send();
 })();
