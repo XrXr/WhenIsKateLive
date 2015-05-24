@@ -42,8 +42,7 @@ h3 {
     margin: 0;
 }
 .hidden {
-    opacity: 0;
-    height: 0;
+    display: none;
 }
 h1 {
     font-size: 36px;

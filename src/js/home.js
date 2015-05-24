@@ -163,33 +163,21 @@
         return get_countdown;
     })();
 
+    function find (selector) {
+        return document.querySelector(selector);
+    }
+
+    function add_class (node, name) {
+        node.classList.add(name);
+    }
+
+    function remove_class (node, name) {
+        node.classList.remove(name);
+    }
+
     // populate the dom with schedule info and return a function used for
     // updating the countdown
     function initialize (streams) {
-        function find (selector) {
-            return document.querySelector(selector);
-        }
-
-        function get_regex (name) {
-            return new RegExp("(?:^|\\s)" +
-                name + "(?!\\S)", 'g');
-        }
-
-        function add_class (node, name) {
-            if (node.className === "") {
-                node.className += " " + name;
-            }
-        }
-
-        function remove_class (node, name) {
-            if (!node.className) {
-                return;
-            }
-            if (node.className.match(get_regex(name)).length > 0) {
-                node.className = node.className.replace(get_regex(name), '');
-            }
-        }
-
         // this will be [[Stream]], the streams that are in the same array
         // start on the same day
         var grouped = [];
@@ -317,11 +305,19 @@
         }
     }
 
-    /********Entry point*********/
+    var loading_message_node = find("#loading-message");
+    var countdown_block = find("#countdown");
+
     var get_schedule = new XMLHttpRequest();
     get_schedule.open("GET", "/schedule.json");
     get_schedule.responseType = "json";
     get_schedule.onload = function () {
+        if (!this.response) {  // something went wrong
+            loading_message_node.textContent =
+                "Schedule loading failed! If this problem persists, " +
+                "please contact the author";
+            return;
+        }
         var streams = make_streams(this.response.map(function (e) {
             return new TimeSlot(e.weekday, e.time, e.duration, e.canceled);
         }));
@@ -378,6 +374,8 @@
             window.find_next_stream = find_next_stream;
             window.setTimeout(window.internal_exported, 0);
         }
+        add_class(loading_message_node, "hidden");
+        remove_class(countdown_block, "hidden");
         tick();
         setInterval(tick, 1000);
     };
