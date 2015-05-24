@@ -88,16 +88,21 @@
             window.streamer_dst = streamer_dst;
             window.visitor_timezone_offset = visitor_timezone_offset;
             window.make_stream = make_stream;
+            window.Stream = Stream;
         }
 
         return schedule.map(make_stream);
     }
 
     // Return a Stream that is currently live. If no such Stream exists,
-    // return the Stream with the closest start time that is in the future
+    // return the Stream with the closest start time that is in the future.
+    // Canceled streams are ignored
     function find_next_stream (streams, since_week_start) {
+        streams = streams.filter(function (stream) {
+            return !stream.canceled;
+        });
         var found;
-        streams.some(function(stream, index) {
+        streams.some(function(stream) {
             if (since_week_start > stream.end_normalized) {
                 return false;  // continue
             }
@@ -229,24 +234,27 @@
         }
         for (var i = 0; i < grouped.length; i++) {
             for (var j = 0; j < grouped[i].length; j++) {
-                body.children[j].children[i].textContent =
-                    grouped[i][j].toString();
+                var target_stream = grouped[i][j];
+                var target_element = body.children[j].children[i];
+
+                var info_node = document.createElement("span");
+                info_node.textContent = grouped[i][j].toString();
+                if (target_stream.canceled) {
+                    add_class(info_node, "canceled");
+                }
+                target_element.appendChild(info_node);
                 // save reference to elements for highlighting later
-                grouped[i][j].dom_elements.push(body.children[j].children[i]);
+                target_stream.dom_elements.push(body.children[j].children[i]);
                 if (j >= 1) {
                     var same_line_element = document.createElement("span");
                     same_line_element.className = "same-line-slots";
                     same_line_element.textContent =
-                        ", " + grouped[i][j].toString();
+                        ", " + target_stream.toString();
                     // this is for the mobile view, thus body.children[0]
-                    body.children[0].children[i].appendChild(
-                        same_line_element);
+                    body.children[0].children[i].appendChild(same_line_element);
                 }
             }
         }
-
-        find("small").textContent =
-            "All times are converted to your local time";
 
         var prefix = find("h3");
         var countdown = find("h1").children[0];

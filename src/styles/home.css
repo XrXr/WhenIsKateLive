@@ -132,6 +132,9 @@ footer span {
 .youtube {
     font-size: 35px;
 }
+.canceled {
+    text-decoration: line-through;
+}
 @media(max-width: 350px) {
     html {
         padding: 0;

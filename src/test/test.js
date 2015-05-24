@@ -1,11 +1,15 @@
+function TimeSlot (weekday, time, duration, canceled) {
+    return {
+        weekday: weekday,
+        time: time,
+        duration: duration,
+        canceled: canceled
+    };
+}
+
 describe('Totally redundant timezone conversion validations', function() {
     it('should covert to convert properly', function() {
-        var converted = make_stream({
-            weekday: "Thursday",
-            time: "11:00 PM",
-            duration: 2,
-            canceled: false
-        });
+        var converted = make_stream(TimeSlot("Thursday", "11:00 PM", 2, false));
         var delta = streamer_dst ? 7 * 60 - window.visitor_timezone_offset :
             8 * 60 - window.visitor_timezone_offset;
         var day = 4;
@@ -23,51 +27,86 @@ function setup_streams_tests () {
         it('should be an array', function() {
             expect(streams).to.be.a("Array");
         });
-        describe('child', function() {
-            var stream = streams[0];
-            describe('start property', function() {
-                it('should exist', function() {
-                    expect(stream).to.have.property("start");
-                });
-                it('is a Moment object', function() {
-                    expect(moment.isMoment(stream.start)).to.be.true;
-                });
+    });
+    describe('find_next_stream()', function() {
+        var FORMAT = 'E H';
+        var fixture = [new Stream(moment('1 10', FORMAT), 2, true),
+                       new Stream(moment('2 15', FORMAT), 4, false),
+                       new Stream(moment('3 14', FORMAT), 3, true),
+                       new Stream(moment('5 13', FORMAT), 3, true),
+                       new Stream(moment('6 19', FORMAT), 2, false)];
+        function since_week_start (moment_instance) {
+            return moment_instance.unix() -
+                moment_instance.clone().startOf('isoWeek').unix();
+        }
+        it('Should return next stream', function () {
+            var subject = moment().startOf('isoWeek').add(14, 'h');
+            var found = find_next_stream(fixture, since_week_start(subject));
+            expect(fixture.indexOf(found)).to.equal(1);
+        });
+        it('Should return stream currently live', function () {
+            var subject = moment().startOf('isoWeek').add(1, 'd').add(16, 'h');
+            var found = find_next_stream(fixture, since_week_start(subject));
+            expect(fixture.indexOf(found)).to.equal(1);
+        });
+        it('Should skip canceled streams', function () {
+            var before = moment().startOf('isoWeek').add(2, 'd').add(11, 'h');
+            var found = find_next_stream(fixture, since_week_start(before));
+            expect(fixture.indexOf(found)).to.equal(4);
+            var during = moment().startOf('isoWeek').add(4, 'd').add(15, 'h');
+            found = find_next_stream(fixture, since_week_start(before));
+            expect(fixture.indexOf(found)).to.equal(4);
+        });
+        it('Should wrap around', function () {
+            var subject = moment().startOf('isoWeek').add(6, 'd').add(22, 'h');
+            var found = find_next_stream(fixture, since_week_start(subject));
+            expect(fixture.indexOf(found)).to.equal(1);
+        });
+    });
+    describe('Stream object', function() {
+        var stream = streams[0];
+        describe('start property', function() {
+            it('should exist', function() {
+                expect(stream).to.have.property("start");
             });
-            describe('end property', function() {
-                it('should exist', function() {
-                    expect(stream).to.have.property("end");
-                });
-                it('is a Moment object', function() {
-                    expect(moment.isMoment(stream.end)).to.be.true;
-                });
-                it('is after start', function() {
-                    expect(stream.end.isAfter(stream.start)).to.be.true;
-                });
-            });
-            describe('start_normalized property', function() {
-                it('should exist', function() {
-                    expect(stream).to.have.property("start_normalized");
-                });
-                it('is a number', function() {
-                    expect(stream.start_normalized).to.be.a('number');
-                });
-            });
-            describe('end_normalized property', function() {
-                it('should exist', function() {
-                    expect(stream).to.have.property("end_normalized");
-                });
-                it('is a number', function() {
-                    expect(stream.end_normalized).to.be.a('number');
-                });
+            it('is a Moment object', function() {
+                expect(moment.isMoment(stream.start)).to.be.true;
             });
         });
-        describe('.is_live()', function() {
-            it('should return true', function() {
-                expect(streams[0].is_live(streams[0].start_normalized)).to.be.true;
+        describe('end property', function() {
+            it('should exist', function() {
+                expect(stream).to.have.property("end");
             });
-            it('should return false', function() {
-                expect(streams[0].is_live(streams[0].start_normalized - 1)).to.be.false;
+            it('is a Moment object', function() {
+                expect(moment.isMoment(stream.end)).to.be.true;
             });
+            it('is after start', function() {
+                expect(stream.end.isAfter(stream.start)).to.be.true;
+            });
+        });
+        describe('start_normalized property', function() {
+            it('should exist', function() {
+                expect(stream).to.have.property("start_normalized");
+            });
+            it('is a number', function() {
+                expect(stream.start_normalized).to.be.a('number');
+            });
+        });
+        describe('end_normalized property', function() {
+            it('should exist', function() {
+                expect(stream).to.have.property("end_normalized");
+            });
+            it('is a number', function() {
+                expect(stream.end_normalized).to.be.a('number');
+            });
+        });
+    });
+    describe('.is_live()', function() {
+        it('should return true', function() {
+            expect(streams[0].is_live(streams[0].start_normalized)).to.be.true;
+        });
+        it('should return false', function() {
+            expect(streams[0].is_live(streams[0].start_normalized - 1)).to.be.false;
         });
     });
 }
