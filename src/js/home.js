@@ -308,7 +308,7 @@
     var countdown_block = find("#countdown");
 
     var get_schedule = new XMLHttpRequest();
-    get_schedule.open("GET", "/schedule.json");
+    get_schedule.open("GET", "schedule.json");
     get_schedule.responseType = "json";
     get_schedule.onload = function () {
         if (!this.response) {  // something went wrong
