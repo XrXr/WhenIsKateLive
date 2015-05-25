@@ -91,7 +91,9 @@
             window.Stream = Stream;
         }
 
-        return schedule.map(make_stream);
+        return schedule.map(make_stream).sort(function (a, b) {
+            return a.start_normalized - b.start_normalized;
+        });
     }
 
     // Return a Stream that is currently live. If no such Stream exists,
@@ -187,25 +189,21 @@
             }
             processed[i] = 0;
             var current = streams[i];
-            var current_day = [current];
+            var same_day = [current];
             var day = current.start.isoWeekday();
-            var week = current.start.isoWeek();
-            var year = current.start.year();
             for (var j = 0; j < streams.length; j++) {
                 if (j in processed) {
                     continue;
                 }
-                if (streams[j].start.isoWeekday() == day &&
-                    streams[j].start.isoWeek() == week &&
-                    streams[j].start.year() == year) {
-                    current_day.push(streams[j]);
+                if (streams[j].start.isoWeekday() === day) {
+                    same_day.push(streams[j]);
                     processed[j] = 0;
                 }
             }
-            if (current_day.length > max_same_day) {
-                max_same_day = current_day.length;
+            if (same_day.length > max_same_day) {
+                max_same_day = same_day.length;
             }
-            grouped.push(current_day);
+            grouped.push(same_day);
         }
 
         var head_tr = document.querySelector('tr');
