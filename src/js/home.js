@@ -368,6 +368,7 @@
         window.get_countdown = get_countdown;
         window.streams = streams;
         window.find_next_stream = find_next_stream;
+        window.setTimeout(window.internal_exported, 0);
     }
     add_class(loading_message_node, "hidden");
     remove_class(countdown_block, "hidden");

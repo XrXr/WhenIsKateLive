@@ -24,6 +24,14 @@ The project uses [Closure Compiler] for JavaScript minification and [clean-css] 
 
 This command will put the minified JavaScript and css into their respective directory such that the page can be viewed normally via a web server rooted at the root of this repo. The schedule info is inserted into the built JavasScript.
 
+#####Development:
+1. Run a static server at the root of the repo
+2. Run `node build_tools/build.js --watch`
+3. Make changes files under `src`
+
+`build.js` will make sure that `js/home.js` is consistent with `src/js/home.js`,
+except with schedule info inserted.
+
 ##Testing
 Tests are written with mocha and Chai
 

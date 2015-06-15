@@ -5,17 +5,20 @@ var path = require("path");
 var fs = require("fs-extra");
 var CleanCSS = require('clean-css');
 
+var is_watch_mode = process.argv[2] === '--watch';
+var build_base = path.resolve('.');
+var source_base = path.resolve('./src');
+
 var paths = (function() {
-    var build_base = path.resolve('.');
     var build_js = path.join(build_base, "js");
     var build_css = path.join(build_base, "styles");
     return {
         css: {
-            in: path.join("./src", "styles", "home.css"),
+            in: path.join(source_base, "styles", "home.css"),
             out: path.join(build_css, "home.css")
         },
         js: {
-            in: path.join("./src", "js", "home.js"),
+            in: path.join(source_base, "js", "home.js"),
             out: path.join(build_js, "home.js")
         },
         build_dir: {
@@ -38,7 +41,7 @@ function minify_css() {
     fs.writeFileSync(paths.css.out, minified, {encoding: "utf8"});
 }
 
-function build_js() {
+function insert_schedule () {
     var original = fs.readFileSync(paths.js.in, {encoding: "utf8"});
     var iopen = original.lastIndexOf("(");
     if (iopen === -1) {
@@ -46,9 +49,10 @@ function build_js() {
     }
     var built = original.slice(0, iopen + 1) + "'" +
                 JSON.stringify(raw_schedule) + "');";
-    var s = new stream.Readable();
-    s.push(built);
-    s.push(null);
+    return built;
+}
+
+function build_js() {
     var options = {
         stdio: [
             null,
@@ -59,7 +63,7 @@ function build_js() {
     var meow = child_proess.spawn("java",
         ["-jar", "./build_tools/compiler.jar", "--js_output_file",
          paths.js.out], options);
-    meow.stdin.end(built, "utf8");
+    meow.stdin.end(insert_schedule(), "utf8");
     meow.on("exit", function (status) {
         if (status !== 0) {
             console.error("Compiling JavaScript with schedule info failed. Aborting");
@@ -68,10 +72,33 @@ function build_js() {
     });
 }
 
-console.log("Ensuring that build directories exist...");
-ensure_build_destination();
-console.log("Minifying " + paths.css.in + " to " + paths.css.out + " ...");
-minify_css();
-console.log("Minifying " + paths.js.in + " with schedule info to " +
-            paths.js.out + " ...");
-build_js();
+function production_build () {
+    console.log("Ensuring that build directories exist...");
+    ensure_build_destination();
+    console.log("Minifying " + paths.css.in + " to " + paths.css.out + " ...");
+    minify_css();
+    console.log("Minifying " + paths.js.in + " with schedule info to " +
+                paths.js.out + " ...");
+    build_js();
+}
+
+function development_build (filename) {
+    console.log(filename + " changed. Building...\n");
+    console.log("Ensuring that build directories exist...");
+    ensure_build_destination();
+    console.log("Copying " + paths.css.in + " to " + paths.css.out + " ...");
+    fs.copySync(paths.css.in, paths.css.out);
+    console.log("Building " + paths.js.in + " with schedule info to " +
+                paths.js.out + " ...");
+    fs.writeFileSync(paths.js.out, insert_schedule());
+    console.log("BUILD FINISHED".green);
+}
+
+if (is_watch_mode) {
+    var watch = require("node-watch");
+    require('colors');
+    console.log('Watching ' + source_base + ' ...');
+    watch(source_base, development_build);
+} else {
+    production_build();
+}
