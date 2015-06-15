@@ -8,7 +8,7 @@ function TimeSlot (weekday, time, duration, canceled) {
 }
 
 describe('Totally redundant timezone conversion validations', function() {
-    it('should covert to convert properly', function() {
+    it('should convert correctly', function() {
         var converted = make_stream(TimeSlot("Thursday", "11:00 PM", 2, false));
         var delta = streamer_dst ? 7 * 60 - window.visitor_timezone_offset :
             8 * 60 - window.visitor_timezone_offset;
