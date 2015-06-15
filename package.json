@@ -1,6 +1,7 @@
 {
     "name": "when-is-kate-live",
     "version": "0.0.10",
+    "license": "MIT",
     "scripts": {
         "build": "node ./build_tools/build.js"
     },
@@ -8,8 +9,8 @@
         "type": "git",
         "url": "https://github.com/XrXr/WhenIsKateLive"
     },
-    "dependencies": {
-        "clean-css": "2.2.13",
-        "shelljs": "0.3.0"
+    "devDependencies": {
+        "clean-css": ">=3.3.2",
+        "fs-extra": ">=0.19.0"
     }
 }

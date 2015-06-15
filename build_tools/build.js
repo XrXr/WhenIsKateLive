@@ -1,6 +1,6 @@
-var shell = require("shelljs");
+var child_proess = require('child_process');
 var path = require("path");
-var fs = require("fs");
+var fs = require("fs-extra");
 var CleanCSS = require('clean-css');
 
 var paths = (function() {
@@ -24,8 +24,10 @@ var paths = (function() {
     };
 })();
 
-function create_build_dir() {
-    fs.mkdirSync();
+function ensure_build_destination() {
+    fs.ensureDirSync(paths.build_dir.base);
+    fs.ensureDirSync(paths.build_dir.js);
+    fs.ensureDirSync(paths.build_dir.css);
 }
 
 function minify_css() {
@@ -35,15 +37,12 @@ function minify_css() {
 }
 
 function minify_js() {
-    var result =
-        shell.exec("java -jar ./build_tools/compiler.jar --js " +
-                   paths.js.in + " --js_output_file " + paths.js.out);
+    child_proess.execSync("java -jar ./build_tools/compiler.jar --js " +
+                          paths.js.in + " --js_output_file " + paths.js.out);
 }
 
-console.log("Making build directories...");
-try{fs.mkdirSync(paths.build_dir.base);}catch(_){}
-try{fs.mkdirSync(paths.build_dir.js);}catch(_){}
-try{fs.mkdirSync(paths.build_dir.css);}catch(_){}
+console.log("Ensuring that build directories exist...");
+ensure_build_destination();
 console.log("Minifying " + paths.js.in + " to " + paths.js.out + " ...");
 minify_js();
 console.log("Minifying " + paths.css.in + " to " + paths.css.out + " ...");
