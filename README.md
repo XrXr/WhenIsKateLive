@@ -22,8 +22,7 @@ The project uses [Closure Compiler] for JavaScript minification and [clean-css] 
 #####To build:
 `npm run build`
 
-This will create a directory `build` that contains the minified script and css. The root of `build` correspond to the
-repo root.
+This command will put the minified JavaScript and css into their respective directory such that the page can be viewed normally via a web server rooted at the root of this repo. The schedule info is inserted into the built JavasScript.
 
 ##Testing
 Tests are written with mocha and Chai

@@ -1,7 +1,7 @@
 // Author: XrXr
 // https://github.com/XrXr/WhenIsKateLive
 // License: MIT
-(function() {
+(function(raw_schedule) {  // the build tool will insert raw_schedule
     "use strict";
     // is the streamer observing DST?
     var an_hour = 3600;
@@ -304,77 +304,73 @@
         }
     }
 
-    var loading_message_node = find("#loading-message");
     var countdown_block = find("#countdown");
+    var loading_message_node = find("#loading-message");
+    var schedule;
+    try {
+        schedule = JSON.parse(raw_schedule);
+    } catch (e) {
+        loading_message_node.textContent =
+            "Schedule loading failed! If this problem persists, " +
+            "please contact the author";
+        return;
+    }
 
-    var get_schedule = new XMLHttpRequest();
-    get_schedule.open("GET", "schedule.json");
-    get_schedule.responseType = "json";
-    get_schedule.onload = function () {
-        if (!this.response) {  // something went wrong
-            loading_message_node.textContent =
-                "Schedule loading failed! If this problem persists, " +
-                "please contact the author";
-            return;
+    var streams = make_streams(schedule);
+    var update_dom = initialize(streams);
+    var stream = streams[0];
+    // this flag indicates wheter a stream was live in the last check
+    var last_check = true;
+    var day_of_week = -1;  // trigger a highlight
+    // TODO: this needs better implementation
+    // countdown dom update should be in the fastest lane
+    function tick() {
+        // check if the stream currently holding is live
+        // yes -> show dom
+        // no  -> was the last live check yes?
+        //        yes -> change holding stream to the next stream, recurse
+        //         no -> calculate time until start, update dom
+        var now = moment();
+        var now_unix = now.unix();
+        var since_week_start = now_unix -
+                               now.clone().startOf("isoWeek").unix();
+        var since_day_start = now_unix - now.clone().startOf("day").unix();
+        var new_day_of_week = now.day();
+        if (new_day_of_week !== day_of_week) {
+            highlight_today(streams, new_day_of_week, stream);
         }
-        var streams = make_streams(this.response);
-        var update_dom = initialize(streams);
-        var stream = streams[0];
-        // this flag indicates wheter a stream was live in the last check
-        var last_check = true;
-        var day_of_week = -1;  // trigger a highlight
-        // TODO: this needs better implementation
-        // countdown dom update should be in the fastest lane
-        function tick() {
-            // check if the stream currently holding is live
-            // yes -> show dom
-            // no  -> was the last live check yes?
-            //        yes -> change holding stream to the next stream, recurse
-            //         no -> calculate time until start, update dom
-            var now = moment();
-            var now_unix = now.unix();
-            var since_week_start = now_unix -
-                                   now.clone().startOf("isoWeek").unix();
-            var since_day_start = now_unix - now.clone().startOf("day").unix();
-            var new_day_of_week = now.day();
-            if (new_day_of_week !== day_of_week) {
-                highlight_today(streams, new_day_of_week, stream);
-            }
-            day_of_week = new_day_of_week;
-            // this will be non-zero on the days that the DST adjustment
-            // happens. On the day DST ends, the elapsed time at the end of the
-            // day is 25 hours. On the day DST starts, it's 23 hours.
-            var observed_difference = now.hour() -
-                Math.floor(since_day_start / an_hour);
-            since_week_start += observed_difference * an_hour;
+        day_of_week = new_day_of_week;
+        // this will be non-zero on the days that the DST adjustment
+        // happens. On the day DST ends, the elapsed time at the end of the
+        // day is 25 hours. On the day DST starts, it's 23 hours.
+        var observed_difference = now.hour() -
+            Math.floor(since_day_start / an_hour);
+        since_week_start += observed_difference * an_hour;
 
-            var is_live = stream.is_live(since_week_start);
-            if (is_live) {
-                last_check = true;
-                return update_dom(true);
-            }
-            // TODO: this could be: check if now is after stream.end
-            if (last_check) {
-                last_check = false;
-                stream = find_next_stream(streams, since_week_start);
-                // stream is changed
-                highlight_today(streams, new_day_of_week, stream);
-                return tick();
-            }
+        var is_live = stream.is_live(since_week_start);
+        if (is_live) {
+            last_check = true;
+            return update_dom(true);
+        }
+        // TODO: this could be: check if now is after stream.end
+        if (last_check) {
             last_check = false;
-            return update_dom(false, get_countdown(since_week_start,
-                                                   stream.start_normalized));
+            stream = find_next_stream(streams, since_week_start);
+            // stream is changed
+            highlight_today(streams, new_day_of_week, stream);
+            return tick();
         }
-        if (window.export_internals) {
-            window.get_countdown = get_countdown;
-            window.streams = streams;
-            window.find_next_stream = find_next_stream;
-            window.setTimeout(window.internal_exported, 0);
-        }
-        add_class(loading_message_node, "hidden");
-        remove_class(countdown_block, "hidden");
-        tick();
-        setInterval(tick, 1000);
-    };
-    get_schedule.send();
-})();
+        last_check = false;
+        return update_dom(false, get_countdown(since_week_start,
+                                               stream.start_normalized));
+    }
+    if (window.export_internals) {
+        window.get_countdown = get_countdown;
+        window.streams = streams;
+        window.find_next_stream = find_next_stream;
+    }
+    add_class(loading_message_node, "hidden");
+    remove_class(countdown_block, "hidden");
+    tick();
+    setInterval(tick, 1000);
+})(/*build tool will insert the schedule as JSON string here*/);
