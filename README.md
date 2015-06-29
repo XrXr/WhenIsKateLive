@@ -2,6 +2,8 @@
 
 ###The web page is live [here][live page] thanks to Github pages!
 
+[![Code Climate](https://codeclimate.com/github/XrXr/WhenIsKateLive/badges/gpa.svg)](https://codeclimate.com/github/XrXr/WhenIsKateLive)
+
 This is a web page that contains the following
  - Count down until the next [Kate Live]
  - Schedule of [Kate Live] in the browser's local time
