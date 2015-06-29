@@ -1,6 +1,8 @@
 // Author: XrXr
 // https://github.com/XrXr/WhenIsKateLive
 // License: MIT
+
+/*global moment*/
 (function(raw_schedule) {  // the build tool will insert raw_schedule
     "use strict";
     // is the streamer observing DST?
@@ -24,13 +26,6 @@
 
     // Make an array of Stream objects given an array of time slots
     function make_streams (schedule) {
-        function iso_to_eng (num) {
-            if (num < 1 || num > 7 || !Number.isInteger(num)) {
-                throw new Error("Invalid iso day of week");
-            }
-            return weekday_names[num - 1];
-        }
-
         function Stream(start_time, duration, canceled) {
             this.start = start_time.clone().zone(visitor_timezone_offset);
             this.end = start_time.clone().zone(visitor_timezone_offset);
@@ -73,7 +68,6 @@
                    since_week_start <= this.end_normalized;
         };
 
-        var streams = {};
         var timezone_suffix = streamer_dst ? "-0700" : "-0800";
         var format = "h:m a Z E WW YYYY";
 
