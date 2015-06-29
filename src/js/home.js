@@ -183,7 +183,9 @@
         var grouped = [];
         var max_same_day = 0;
         var processed = {};
-        for (var i = 0; i < streams.length; i++) {
+        var i, j;
+
+        for (i = 0; i < streams.length; i++) {
             if (i in processed) {
                 continue;
             }
@@ -191,7 +193,7 @@
             var current = streams[i];
             var same_day = [current];
             var day = current.start.isoWeekday();
-            for (var j = 0; j < streams.length; j++) {
+            for (j = 0; j < streams.length; j++) {
                 if (j in processed) {
                     continue;
                 }
@@ -210,7 +212,7 @@
         while (head_tr.children.length < grouped.length) {
             head_tr.appendChild(document.createElement("th"));
         }
-        for (var i = 0; i < grouped.length; i++) {
+        for (i = 0; i < grouped.length; i++) {
             head_tr.children[i].textContent =
                 grouped[i][0].start.format("dddd");
             // save reference to elements for highlighting later
@@ -221,7 +223,7 @@
         while (body.children.length < max_same_day) {
             body.appendChild(document.createElement("tr"));
         }
-        for (var i = 0; i < body.children.length; i++) {
+        for (i = 0; i < body.children.length; i++) {
             var current_tr = body.children[i];
             while (current_tr.children.length < grouped.length) {
                 current_tr.appendChild(document.createElement("td"));
@@ -230,8 +232,8 @@
                 current_tr.className = "auxiliary-slots";
             }
         }
-        for (var i = 0; i < grouped.length; i++) {
-            for (var j = 0; j < grouped[i].length; j++) {
+        for (i = 0; i < grouped.length; i++) {
+            for (j = 0; j < grouped[i].length; j++) {
                 var target_stream = grouped[i][j];
                 var target_element = body.children[j].children[i];
 
@@ -282,8 +284,10 @@
     // highlight all streams that starts on the same day of `next_stream`
     function highlight_today(streams, today, next_stream) {
         var found = false;
-        for (var i = 0; i < streams.length; i++) {
-            for (var j = 0; j < streams[i].dom_elements.length; j++) {
+        var i, j;
+
+        for (i = 0; i < streams.length; i++) {
+            for (j = 0; j < streams[i].dom_elements.length; j++) {
                 if (streams[i].start.day() === today) {
                     streams[i].dom_elements[j].style.color = black;
                     found = true;
@@ -294,9 +298,9 @@
         }
         if (!found) {
             var target_day = next_stream.start.day();
-            for (var i = 0; i < streams.length; i++) {
+            for (i = 0; i < streams.length; i++) {
                 if (streams[i].start.day() === target_day) {
-                    for (var j = 0; j < streams[i].dom_elements.length; j++) {
+                    for (j = 0; j < streams[i].dom_elements.length; j++) {
                         streams[i].dom_elements[j].style.color = black;
                     }
                 }
