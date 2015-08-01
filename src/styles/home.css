@@ -19,6 +19,9 @@ body {
     height: 100%;
     width: 100%;
 }
+td {
+    max-width: 80px;
+}
 .content-box {
     display: table-cell;
     vertical-align: middle;
