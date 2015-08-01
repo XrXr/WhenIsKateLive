@@ -2,6 +2,7 @@ var child_proess = require("child_process");
 var stream = require("stream");
 var path = require("path");
 var fs = require("fs-extra");
+var acorn = require("acorn");
 var schedule_path = path.join(__dirname, '../schedule.json');
 var raw_schedule = loadSchedule();
 var CleanCSS = require('clean-css');
@@ -48,8 +49,9 @@ function build_with_schedule () {
     if (iopen === -1) {
         throw new Error("Could not find location to insert schedule in the original source");
     }
-    var built = original.slice(0, iopen + 1) + "'" +
-                JSON.stringify(raw_schedule) + "');";
+    var built = original.slice(0, iopen + 1) +
+        JSON.stringify(raw_schedule) + ");";
+    acorn.parse(built);
     return built;
 }
 
@@ -87,7 +89,7 @@ function production_build () {
     build_js();
 }
 
-function development_build (filename) {
+function _development_build (filename) {
     if (filename) {
         console.log(filename + " changed. Building...\n");
     }
@@ -98,7 +100,16 @@ function development_build (filename) {
     console.log("Building " + paths.js.in + " with schedule info to " +
                 paths.js.out + " ...");
     fs.writeFileSync(paths.js.out, build_with_schedule());
-    console.log("BUILD FINISHED".green);
+    console.log("BUILD SUCCESSFUL".green);
+}
+
+function development_build (filename) {
+    try {
+        _development_build(filename);
+    } catch(e) {
+        console.log("BUILD FAILED".red);
+        console.error((e.name + ": " + e.message).red);
+    }
 }
 
 if (is_watch_mode) {

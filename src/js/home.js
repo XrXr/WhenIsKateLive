@@ -3,7 +3,7 @@
 // License: MIT
 
 /*global moment*/
-(function(raw_schedule) {  // the build tool will insert raw_schedule
+(function(schedule_data) {  // the build tool will insert schedule_data
     "use strict";
     // is the streamer observing DST?
     var an_hour = 3600;
@@ -348,17 +348,8 @@
 
     var countdown_block = find("#countdown");
     var loading_message_node = find("#loading-message");
-    var schedule;
-    try {
-        schedule = JSON.parse(raw_schedule);
-    } catch (e) {
-        loading_message_node.textContent =
-            "Schedule loading failed! If this problem persists, " +
-            "please contact the author";
-        return;
-    }
 
-    var streams = make_streams(schedule);
+    var streams = make_streams(schedule_data);
     var grouped_streams = group_streams(streams);
     var max_same_day = Math.max.apply(null, grouped_streams.map(function (e) {
         return e.length;
@@ -412,4 +403,4 @@
     remove_class(countdown_block, "hidden");
     tick();
     setInterval(tick, 1000);
-})(/*build tool will insert the schedule as JSON string here*/);
+})(/*build tool will insert the schedule as an object here*/);
