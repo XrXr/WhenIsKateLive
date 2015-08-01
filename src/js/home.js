@@ -204,30 +204,27 @@
     function initialize (grouped, max_same_day) {
         var i, j;
 
-        var head_tr = document.querySelector('tr');
-        while (head_tr.children.length < grouped.length) {
-            head_tr.appendChild(document.createElement("th"));
-        }
+        var head_tr = find('tr');
         for (i = 0; i < grouped.length; i++) {
-            head_tr.children[i].textContent =
-                grouped[i][0].start.format("dddd");
+            var th = document.createElement("th");
+            th.textContent = grouped[i][0].start.format("dddd");
             // save reference to elements for highlighting later
-            grouped[i][0].dom_elements.push(head_tr.children[i]);
+            grouped[i][0].dom_elements.push(th);
+            head_tr.appendChild(th);
         }
 
-        var body = document.querySelector("tbody");
-        while (body.children.length < max_same_day) {
-            body.appendChild(document.createElement("tr"));
-        }
-        for (i = 0; i < body.children.length; i++) {
-            var current_tr = body.children[i];
+        var body = find("tbody");
+        for (i = 0; i < max_same_day; i++) {
+            var current_tr = document.createElement("tr");
             while (current_tr.children.length < grouped.length) {
                 current_tr.appendChild(document.createElement("td"));
             }
             if (i !== 0) {
                 current_tr.className = "auxiliary-slots";
             }
+            body.appendChild(current_tr);
         }
+
         for (i = 0; i < grouped.length; i++) {
             for (j = 0; j < grouped[i].length; j++) {
                 var target_stream = grouped[i][j];
