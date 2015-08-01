@@ -215,14 +215,11 @@
 
         var body = find("tbody");
         for (i = 0; i < max_same_day; i++) {
-            var current_tr = document.createElement("tr");
-            while (current_tr.children.length < grouped.length) {
-                current_tr.appendChild(document.createElement("td"));
-            }
+            var tr = filled_tr(grouped.length);
             if (i !== 0) {
-                current_tr.className = "auxiliary-slots";
+                tr.className = "auxiliary-slots";
             }
-            body.appendChild(current_tr);
+            body.appendChild(tr);
         }
 
         for (i = 0; i < grouped.length; i++) {
@@ -239,6 +236,14 @@
                         .appendChild(gen_schedule_node(target_stream, true));
                 }
             }
+        }
+
+        function filled_tr (num_columns) {
+            var tr = document.createElement("tr");
+            while (tr.children.length < num_columns) {
+                tr.appendChild(document.createElement("td"));
+            }
+            return tr;
         }
     }
 
