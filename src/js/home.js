@@ -169,15 +169,13 @@
         node.classList.remove(name);
     }
 
-    // populate the dom with schedule info and return a function used for
-    // updating the countdown
-    function initialize (streams) {
-        // this will be [[Stream]], the streams that are in the same array
-        // start on the same day
-        var grouped = [];
-        var max_same_day = 0;
-        var processed = {};
+    // Return [[Stream]]. The streams that are in the same array start on the
+    // same day
+    function group_streams (streams) {
         var i, j;
+
+        var grouped = [];
+        var processed = {};
 
         for (i = 0; i < streams.length; i++) {
             if (i in processed) {
@@ -196,11 +194,15 @@
                     processed[j] = 0;
                 }
             }
-            if (same_day.length > max_same_day) {
-                max_same_day = same_day.length;
-            }
             grouped.push(same_day);
         }
+        return grouped;
+    }
+
+    // populate the dom with schedule info and return a function used for
+    // updating the countdown
+    function initialize (grouped, max_same_day) {
+        var i, j;
 
         var head_tr = document.querySelector('tr');
         while (head_tr.children.length < grouped.length) {
@@ -249,7 +251,9 @@
                 }
             }
         }
+    }
 
+    var update_dom = (function () {
         var prefix = find("h3");
         var countdown = find("h1").children[0];
         var hide_class = "hidden";
@@ -271,7 +275,7 @@
             countdown.href = "#";
         }
         return update_dom;
-    }
+    })();
 
     // highlight all the streams that starts on `today`. `today` is an integer
     // with Sunday as 0 and Saturday as 6. If no stream is happening on `today`
@@ -302,6 +306,21 @@
         }
     }
 
+    // now :: Moment
+    function calc_since_week_start (now) {
+        var now_unix = now.unix();
+        var since_week_start = now_unix -
+                               now.clone().startOf("isoWeek").unix();
+        var since_day_start = now_unix - now.clone().startOf("day").unix();
+        // this will be non-zero on the days that the DST adjustment
+        // happens. On the day DST ends, the elapsed time at the end of the
+        // day is 25 hours. On the day DST starts, it's 23 hours.
+        var observed_difference = now.hour() -
+            Math.floor(since_day_start / an_hour);
+        since_week_start += observed_difference * an_hour;
+        return since_week_start;
+    }
+
     var countdown_block = find("#countdown");
     var loading_message_node = find("#loading-message");
     var schedule;
@@ -315,11 +334,16 @@
     }
 
     var streams = make_streams(schedule);
-    var update_dom = initialize(streams);
+    var grouped_streams = group_streams(streams);
+    var max_same_day = Math.max.apply(null, grouped_streams.map(function (e) {
+        return e.length;
+    }));
+    initialize(grouped_streams, max_same_day);
+
     var stream = streams[0];
     // this flag indicates wheter a stream was live in the last check
-    var last_check = true;
-    var day_of_week = -1;  // trigger a highlight
+    var live_in_last_check = true;
+    var current_day_of_week = -1;  // trigger a highlight
     // TODO: this needs better implementation
     // countdown dom update should be in the fastest lane
     function tick() {
@@ -329,39 +353,30 @@
         //        yes -> change holding stream to the next stream, recurse
         //         no -> calculate time until start, update dom
         var now = moment();
-        var now_unix = now.unix();
-        var since_week_start = now_unix -
-                               now.clone().startOf("isoWeek").unix();
-        var since_day_start = now_unix - now.clone().startOf("day").unix();
+        var since_week_start = calc_since_week_start(now);
         var new_day_of_week = now.day();
-        if (new_day_of_week !== day_of_week) {
+        if (new_day_of_week !== current_day_of_week) {
             highlight_today(streams, new_day_of_week, stream);
         }
-        day_of_week = new_day_of_week;
-        // this will be non-zero on the days that the DST adjustment
-        // happens. On the day DST ends, the elapsed time at the end of the
-        // day is 25 hours. On the day DST starts, it's 23 hours.
-        var observed_difference = now.hour() -
-            Math.floor(since_day_start / an_hour);
-        since_week_start += observed_difference * an_hour;
+        current_day_of_week = new_day_of_week;
 
-        var is_live = stream.is_live(since_week_start);
-        if (is_live) {
-            last_check = true;
+        if (stream.is_live(since_week_start)) {
+            live_in_last_check = true;
             return update_dom(true);
         }
         // TODO: this could be: check if now is after stream.end
-        if (last_check) {
-            last_check = false;
+        if (live_in_last_check) {
+            live_in_last_check = false;
             stream = find_next_stream(streams, since_week_start);
             // stream is changed
             highlight_today(streams, new_day_of_week, stream);
             return tick();
         }
-        last_check = false;
+        live_in_last_check = false;
         return update_dom(false, get_countdown(since_week_start,
                                                stream.start_normalized));
     }
+
     if (window.export_internals) {
         window.get_countdown = get_countdown;
         window.streams = streams;
