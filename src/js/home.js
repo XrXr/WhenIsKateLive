@@ -206,10 +206,11 @@
 
         var head_tr = find('tr');
         for (i = 0; i < grouped.length; i++) {
+            var first_stream = grouped[i][0];
             var th = document.createElement("th");
-            th.textContent = grouped[i][0].start.format("dddd");
+            th.textContent = first_stream.start.format("dddd");
             // save reference to elements for highlighting later
-            grouped[i][0].dom_elements.push(th);
+            first_stream.dom_elements.push(th);
             head_tr.appendChild(th);
         }
 
@@ -230,23 +231,29 @@
                 var target_stream = grouped[i][j];
                 var target_element = body.children[j].children[i];
 
-                var info_node = document.createElement("span");
-                info_node.textContent = grouped[i][j].toString();
-                if (target_stream.canceled) {
-                    add_class(info_node, "canceled");
-                }
-                target_element.appendChild(info_node);
+                target_element.appendChild(gen_schedule_node(target_stream));
                 // save reference to elements for highlighting later
-                target_stream.dom_elements.push(body.children[j].children[i]);
+                target_stream.dom_elements.push(target_element);
                 if (j >= 1) {
-                    var same_line_element = document.createElement("span");
-                    same_line_element.className = "same-line-slots";
-                    same_line_element.textContent =
-                        ", " + target_stream.toString();
                     // this is for the mobile view, thus body.children[0]
-                    body.children[0].children[i].appendChild(same_line_element);
+                    body.children[0].children[i]
+                        .appendChild(gen_schedule_node(target_stream, true));
                 }
             }
+        }
+
+        function gen_schedule_node (stream, same_line) {
+            var node = document.createElement("span");
+            var node_text = stream.toString();
+            if (same_line) {
+                node_text = ", " + node_text;
+                add_class(node, "same-line-slots");
+            }
+            node.textContent = node_text;
+            if (stream.canceled) {
+                add_class(node, "canceled");
+            }
+            return node;
         }
     }
 
