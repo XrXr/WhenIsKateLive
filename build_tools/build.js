@@ -1,8 +1,9 @@
 var child_proess = require("child_process");
-var raw_schedule = require("../schedule.json");
 var stream = require("stream");
 var path = require("path");
 var fs = require("fs-extra");
+var schedule_path = path.join(__dirname, '../schedule.json');
+var raw_schedule = loadSchedule();
 var CleanCSS = require('clean-css');
 
 var is_watch_mode = process.argv[2] === '--watch';
@@ -36,13 +37,13 @@ function ensure_build_destination() {
 }
 
 function minify_css() {
-    var original = fs.readFileSync(paths.css.in, {encoding: "utf8"});
+    var original = fs.readFileSync(paths.css.in, "utf8");
     var minified = new CleanCSS().minify(original).styles;
-    fs.writeFileSync(paths.css.out, minified, {encoding: "utf8"});
+    fs.writeFileSync(paths.css.out, minified, "utf8");
 }
 
-function insert_schedule () {
-    var original = fs.readFileSync(paths.js.in, {encoding: "utf8"});
+function build_with_schedule () {
+    var original = fs.readFileSync(paths.js.in, "utf8");
     var iopen = original.lastIndexOf("(");
     if (iopen === -1) {
         throw new Error("Could not find location to insert schedule in the original source");
@@ -63,13 +64,17 @@ function build_js() {
     var meow = child_proess.spawn("java",
         ["-jar", "./build_tools/compiler.jar", "--js_output_file",
          paths.js.out], options);
-    meow.stdin.end(insert_schedule(), "utf8");
+    meow.stdin.end(build_with_schedule(), "utf8");
     meow.on("exit", function (status) {
         if (status !== 0) {
             console.error("Compiling JavaScript with schedule info failed. Aborting");
             process.exit(1);
         }
     });
+}
+
+function loadSchedule () {
+    return JSON.parse(fs.readFileSync(schedule_path));
 }
 
 function production_build () {
@@ -83,22 +88,26 @@ function production_build () {
 }
 
 function development_build (filename) {
-    console.log(filename + " changed. Building...\n");
+    if (filename) {
+        console.log(filename + " changed. Building...\n");
+    }
     console.log("Ensuring that build directories exist...");
     ensure_build_destination();
     console.log("Copying " + paths.css.in + " to " + paths.css.out + " ...");
     fs.copySync(paths.css.in, paths.css.out);
     console.log("Building " + paths.js.in + " with schedule info to " +
                 paths.js.out + " ...");
-    fs.writeFileSync(paths.js.out, insert_schedule());
+    fs.writeFileSync(paths.js.out, build_with_schedule());
     console.log("BUILD FINISHED".green);
 }
 
 if (is_watch_mode) {
     var watch = require("node-watch");
     require('colors');
+    development_build();
+    console.log();
     console.log('Watching ' + source_base + ' ...');
-    watch(source_base, development_build);
+    watch([source_base, schedule_path], development_build);
 } else {
     production_build();
 }
