@@ -199,9 +199,8 @@
         return grouped;
     }
 
-    // populate the dom with schedule info and return a function used for
-    // updating the countdown
-    function initialize (grouped, max_same_day) {
+    // populate the dom with schedule info
+    function display_schedule (grouped, max_same_day) {
         var i, j;
 
         var head_tr = find('tr');
@@ -241,20 +240,20 @@
                 }
             }
         }
+    }
 
-        function gen_schedule_node (stream, same_line) {
-            var node = document.createElement("span");
-            var node_text = stream.toString();
-            if (same_line) {
-                node_text = ", " + node_text;
-                add_class(node, "same-line-slots");
-            }
-            node.textContent = node_text;
-            if (stream.canceled) {
-                add_class(node, "canceled");
-            }
-            return node;
+    function gen_schedule_node (stream, same_line) {
+        var node = document.createElement("span");
+        var node_text = stream.toString();
+        if (same_line) {
+            node_text = ", " + node_text;
+            add_class(node, "same-line-slots");
         }
+        node.textContent = node_text;
+        if (stream.canceled) {
+            add_class(node, "canceled");
+        }
+        return node;
     }
 
     var update_dom = (function () {
@@ -342,7 +341,7 @@
     var max_same_day = Math.max.apply(null, grouped_streams.map(function (e) {
         return e.length;
     }));
-    initialize(grouped_streams, max_same_day);
+    display_schedule(grouped_streams, max_same_day);
 
     var stream = streams[0];
     // this flag indicates wheter a stream was live in the last check
