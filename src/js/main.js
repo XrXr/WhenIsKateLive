@@ -2,7 +2,7 @@
 // https://github.com/XrXr/WhenIsKateLive
 // License: MIT
 
-import schedule_data from '../schedule';
+import schedule_data from './schedule';
 import { an_hour } from './constants';
 import display_schedule from './dom-manip/display-schedule';
 import make_streams from './stream/make-streams';
