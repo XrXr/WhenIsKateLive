@@ -11,11 +11,11 @@
   },
   "devDependencies": {
     "acorn": "2.1.0",
+    "browser-sync": "^2.9.12",
     "clean-css": "3.3.2",
     "colors": "1.1.0",
     "fs-extra": "0.19.0",
     "gulp": "^3.9.0",
-    "gulp-livereload": "^3.8.1",
     "node-watch": "0.3.4",
     "rollup": "^0.20.5"
   }

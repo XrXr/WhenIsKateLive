@@ -1,6 +1,6 @@
 var gulp = require('gulp'),
     rollup = require('rollup'),
-    livereload = require('gulp-livereload');
+    browserSync = require('browser-sync');
 
 var ENTRY = 'src/js/main.js';
 var DEST = 'js/main.js';
@@ -18,12 +18,19 @@ gulp.task('bundle', function() {
 
 gulp.task('default', ['bundle']);
 
-gulp.task('livereload', ['bundle'], function () {
-    livereload.reload();
+gulp.task('build-and-reload', ['bundle'], function () {
+    browserSync.reload();
 });
 
-gulp.task('watch', function() {
-  livereload.listen();
-  gulp.watch('src/**/*.js', ['livereload']);
-  return new Promise(function () {});
+gulp.task('serve', function(cb) {
+  browserSync({
+    server: {
+      baseDir: './'
+    },
+    notify: false,
+    ui: false,
+    ghostMode: false
+  });
+
+  gulp.watch(['*.html', 'css/**/*.css', 'js/**/*.js'], {cwd: 'src'}, ['build-and-reload']);
 });
