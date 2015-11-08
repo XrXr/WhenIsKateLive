@@ -1,4 +1,4 @@
-[
+export default [
   {
     "weekday": "Monday",
     "time": "6:00 PM",
@@ -29,4 +29,4 @@
     "duration": 2,
     "canceled": false
   }
-]
+];

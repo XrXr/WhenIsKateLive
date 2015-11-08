@@ -16,6 +16,8 @@ gulp.task('bundle', function() {
     });
 });
 
+gulp.task('default', ['bundle']);
+
 gulp.task('livereload', ['bundle'], function () {
     livereload.reload();
 });
