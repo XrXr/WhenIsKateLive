@@ -9,4 +9,3 @@ export function add_class (node, name) {
 export function remove_class (node, name) {
     node.classList.remove(name);
 }
-
