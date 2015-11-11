@@ -31,11 +31,12 @@
   </div>
   <div id="mocha" style="margin: 20px 50px;"></div>
   <script src="mocha.js"></script>
+  <script data-cover-only="js/" src="blanket_mocha.min.js"></script>
   <script src="chai.js"></script>
   <script>mocha.setup('bdd');</script>
   <script>expect = chai.expect;</script>
   <script>var export_internals = true;</script>
   <script src="test.js"></script>
-  <script src="../js/main.js"></script>
+  <script src="../js/main-no-minified.js"></script>
 </body>
 </html>

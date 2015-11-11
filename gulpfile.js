@@ -5,34 +5,41 @@ var gulp = require('gulp'),
     minifyCss = require('gulp-minify-css');
 
 var ENTRY = 'src/js/main.js';
-var DEST = 'js/main.js';
+var MIN_DEST = 'js/main.js';
+var NORMAL_DEST = 'js/main-no-minified.js';
 
 gulp.task('bundle', function() {
     return rollup.rollup({
         entry: ENTRY
-        }).then(function (bundle) {
-            return bundle.write({
+    }).then(function(bundle) {
+        return Promise.all([
+            bundle.write({
                 format: 'iife',
-                dest: DEST
-                });
-            });
-        });
+                dest: NORMAL_DEST
+            }),
+            bundle.write({
+                format: 'iife',
+                dest: NORMAL_DEST
+            })
+        ]);
+    });
+});
 
 gulp.task('minify-css', function() {
     return gulp.src('src/styles/*.css')
-    .pipe(minifyCss())
-    .pipe(gulp.dest('./styles'));
-    });
+        .pipe(minifyCss())
+        .pipe(gulp.dest('./styles'));
+});
 
 gulp.task('minify-js', ['bundle'], function() {
-    return gulp.src('js/*.js')
-    .pipe(uglify())
-    .pipe(gulp.dest('js'));
-    });
+    return gulp.src(MIN_DEST)
+        .pipe(uglify())
+        .pipe(gulp.dest('js'));
+});
 
-gulp.task('build-and-reload', ['minify-css', 'bundle'], function () {
+gulp.task('build-and-reload', ['minify-css', 'bundle'], function() {
     browserSync.reload();
-    });
+});
 
 gulp.task('serve', function(cb) {
     browserSync({
@@ -44,7 +51,9 @@ gulp.task('serve', function(cb) {
         ghostMode: false
     });
 
-    gulp.watch(['*.html', 'styles/**/*.css', 'js/**/*.js'], {cwd: 'src'}, ['build-and-reload']);
+    gulp.watch(['*.html', 'styles/**/*.css', 'js/**/*.js'], {
+        cwd: 'src'
+    }, ['build-and-reload']);
 });
 
 gulp.task('default', ['minify-css', 'minify-js']);
