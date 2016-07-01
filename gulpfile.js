@@ -3,7 +3,7 @@ var gulp = require('gulp'),
     browserSync = require('browser-sync'),
     uglify = require('gulp-uglify'),
     rename = require('gulp-rename'),
-    minifyCss = require('gulp-minify-css');
+    minifyCss = require('gulp-clean-css');
 
 var ENTRY = 'src/js/main.js';
 var MIN_DEST = 'js/main.js';
