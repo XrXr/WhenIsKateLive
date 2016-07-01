@@ -20,14 +20,14 @@
       "canceled": false
     },
     {
-      "weekday": "Wednesday",
-      "time": "5:00 PM",
+      "weekday": "Thursday",
+      "time": "9:00 PM",
       "duration": 2,
       "canceled": false
     },
     {
-      "weekday": "Thursday",
-      "time": "9:00 PM",
+      "weekday": "Friday",
+      "time": "1:00 PM",
       "duration": 2,
       "canceled": false
     },
