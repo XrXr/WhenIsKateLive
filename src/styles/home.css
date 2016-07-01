@@ -89,7 +89,7 @@ nav {
 .site {
     display: inline-block;
     text-decoration: none;
-    font-size: 40px;
+    font-size: 2em;
     padding: 16px 0;
     margin: 0 16px;
 }
@@ -100,8 +100,14 @@ nav {
 }
 .site .name {
     color: #333;
-    padding-left: 8px;
+    padding-left: 3px;
     vertical-align: middle;
+}
+.twitch > img {
+    height: 1.2em;
+}
+.youtube > .name {
+    padding-left: 8px;
 }
 footer {
     padding: 8px 16px;
@@ -125,15 +131,6 @@ footer span {
 }
 .same-line-slots {
     display: none;
-}
-.twitter {
-    font-size: 32px;
-}
-.twitch {
-    font-size: 35px;
-}
-.youtube {
-    font-size: 35px;
 }
 .canceled {
     text-decoration: line-through;
