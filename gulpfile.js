@@ -2,6 +2,7 @@ var gulp = require('gulp'),
     rollup = require('rollup'),
     browserSync = require('browser-sync'),
     uglify = require('gulp-uglify'),
+    rename = require('gulp-rename'),
     minifyCss = require('gulp-minify-css');
 
 var ENTRY = 'src/js/main.js';
@@ -32,8 +33,9 @@ gulp.task('minify-css', function() {
 });
 
 gulp.task('minify-js', ['bundle'], function() {
-    return gulp.src(MIN_DEST)
+    return gulp.src(NORMAL_DEST)
         .pipe(uglify())
+        .pipe(rename('main.js'))
         .pipe(gulp.dest('js'));
 });
 
