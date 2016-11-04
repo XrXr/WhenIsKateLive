@@ -20,6 +20,12 @@
       "canceled": false
     },
     {
+      "weekday": "Tuesday",
+      "time": "6:00 PM",
+      "duration": 3,
+      "canceled": false
+    },
+    {
       "weekday": "Thursday",
       "time": "9:00 PM",
       "duration": 2,
@@ -35,6 +41,12 @@
       "weekday": "Saturday",
       "time": "3:00 PM",
       "duration": 2,
+      "canceled": false
+    },
+    {
+      "weekday": "Saturday",
+      "time": "6:00 PM",
+      "duration": 3,
       "canceled": false
     },
     {
