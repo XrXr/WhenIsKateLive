@@ -39,7 +39,7 @@ gulp.task('minify-js', ['bundle'], function() {
         .pipe(gulp.dest('js'));
 });
 
-gulp.task('build-and-reload', ['minify-css', 'bundle'], function() {
+gulp.task('build-and-reload', ['default'], function() {
     browserSync.reload();
 });
 
