@@ -156,7 +156,4 @@ describe('get_countdown()', function() {
     });
 });
 
-function internal_exported () {
-    mocha.run();
-    setup_streams_tests();
-}
+setup_streams_tests();

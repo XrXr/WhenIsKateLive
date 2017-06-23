@@ -403,14 +403,7 @@
 
   var stream = streams[0];
   var current_day_of_week = -1;  // trigger a highlight
-  // TODO: this needs better implementation
-  // countdown dom update should be in the fastest lane
   function tick() {
-      // check if the stream currently holding is live
-      // yes -> show dom
-      // no  -> was the last live check yes?
-      //        yes -> change holding stream to the next stream, recurse
-      //         no -> calculate time until start, update dom
       var now = moment();
       var since_week_start = calc_since_week_start(now);
       var new_day_of_week = now.day();
@@ -433,16 +426,15 @@
                                                    stream.start_normalized));
   }
 
-  if (window.export_internals) {
-      window.get_countdown = get_countdown;
-      window.streams = streams;
-      window.find_next_stream = find_next_stream;
-      window.setTimeout(window.internal_exported, 0);
-  }
-
   add_class(loading_message_node, "hidden");
   remove_class(countdown_block, "hidden");
   tick();
   setInterval(tick, 1000);
+
+  if (window.export_internals) {
+      window.get_countdown = get_countdown;
+      window.streams = streams;
+      window.find_next_stream = find_next_stream;
+  }
 
 })();
