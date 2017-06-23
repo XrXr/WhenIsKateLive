@@ -24,6 +24,9 @@ Stream.prototype.toString = function() {
     var end_suffix = end.format("a");
 
     var start_format = base_format(this.start);
+    if (!this.duration) {
+        return format_stream(start, start_format);
+    }
     var end_format = base_format(this.end);
 
     // assume duration > 0. This is for making time like 10 to 12 am
@@ -39,14 +42,17 @@ Stream.prototype.toString = function() {
     return format_stream(start, start_format) + " to " +
         format_stream(end, end_format);
 
-    function format_stream (stream, format_arr) {
-        var hour = stream.hours();
-        if (hour === 12) {
-            return 'Noon';
-        } else if (hour === 0) {
-            return 'Beginning of day';
+    function format_stream (time, format_arr) {
+        var hour = time.hours();
+        var minutes = time.minutes();
+        if (minutes === 0) {
+            if (hour === 12) {
+                return 'Noon';
+            } else if (hour === 0) {
+                return 'Beginning of day';
+            }
         }
-        return stream.format(format_arr.join(" "));
+        return time.format(format_arr.join(" "));
     }
 };
 

@@ -80,9 +80,6 @@ function setup_streams_tests () {
             it('is a Moment object', function() {
                 expect(moment.isMoment(stream.end)).to.be.true;
             });
-            it('is after start', function() {
-                expect(stream.end.isAfter(stream.start)).to.be.true;
-            });
         });
         describe('start_normalized property', function() {
             it('should exist', function() {
@@ -98,6 +95,18 @@ function setup_streams_tests () {
             });
             it('is a number', function() {
                 expect(stream.end_normalized).to.be.a('number');
+            });
+        });
+        describe('toString()', function() {
+            it('returns special string for exactly noon', function () {
+                var noon = moment().hours(12).minutes(0);
+                var stream = new Stream(noon, 0, false);
+                expect(stream.toString()).to.equal('Noon');
+            });
+            it('returns special string for midnight', function () {
+                var midnight = moment().hours(0).minutes(0);
+                var stream = new Stream(midnight, 0, false);
+                expect(stream.toString()).to.equal('Beginning of day');
             });
         });
     });
@@ -140,6 +149,6 @@ describe('get_countdown()', function() {
 });
 
 function internal_exported () {
-    setup_streams_tests();
     mocha.run();
+    setup_streams_tests();
 }
