@@ -122,9 +122,12 @@
   };
 
   Stream.prototype.is_live = function(since_week_start) {
+      if (!this.duration) {
+          return false;
+      }
       // in seconds
       return since_week_start >= this.start_normalized &&
-             since_week_start <= this.end_normalized;
+          since_week_start <= this.end_normalized;
   };
 
   function base_format (moment_instance) {
@@ -399,8 +402,6 @@
   display_schedule(grouped_streams, max_same_day);
 
   var stream = streams[0];
-  // this flag indicates wheter a stream was live in the last check
-  var live_in_last_check = true;
   var current_day_of_week = -1;  // trigger a highlight
   // TODO: this needs better implementation
   // countdown dom update should be in the fastest lane
@@ -419,18 +420,15 @@
       current_day_of_week = new_day_of_week;
 
       if (stream.is_live(since_week_start)) {
-          live_in_last_check = true;
           return update_countdown(true);
       }
-      // TODO: this could be: check if now is after stream.end
-      if (live_in_last_check) {
-          live_in_last_check = false;
+
+      if (since_week_start > stream.end_normalized) {
           stream = find_next_stream(streams, since_week_start);
           // stream is changed
           highlight_today(streams, new_day_of_week, stream);
           return tick();
       }
-      live_in_last_check = false;
       return update_countdown(false, get_countdown(since_week_start,
                                                    stream.start_normalized));
   }

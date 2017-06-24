@@ -112,10 +112,18 @@ function setup_streams_tests () {
     });
     describe('.is_live()', function() {
         it('should return true', function() {
-            expect(streams[0].is_live(streams[0].start_normalized)).to.be.true;
+            var stream = new Stream(moment(), 2, false);
+            expect(stream.is_live(stream.start_normalized)).to.be.true;
         });
         it('should return false', function() {
-            expect(streams[0].is_live(streams[0].start_normalized - 1)).to.be.false;
+            var stream = new Stream(moment(), 2, false);
+            expect(stream.is_live(stream.start_normalized - 1)).to.be.false;
+        });
+        it('is never live if there is no duration', function () {
+            var zero_duration = new Stream(moment(), 0, false);
+            var undefined_duration = new Stream(moment(), undefined, false);
+            expect(zero_duration.is_live(zero_duration.start_normalized)).to.be.false;
+            expect(undefined_duration.is_live(undefined_duration.start_normalized)).to.be.false;
         });
     });
 }

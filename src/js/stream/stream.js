@@ -57,9 +57,12 @@ Stream.prototype.toString = function() {
 };
 
 Stream.prototype.is_live = function(since_week_start) {
+    if (!this.duration) {
+        return false;
+    }
     // in seconds
     return since_week_start >= this.start_normalized &&
-           since_week_start <= this.end_normalized;
+        since_week_start <= this.end_normalized;
 };
 
 function base_format (moment_instance) {
