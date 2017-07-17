@@ -7,12 +7,9 @@ export default function Stream(start_time, duration, canceled) {
     this.end = this.start.clone();
     this.end.add('hours', duration);
     this.duration = duration;
-    // normalized to the start of the iso week
-    this.start_normalized = this.start.unix() -
-                            this.start.clone().
-                            startOf("isoWeek").unix();
-    this.end_normalized = this.end.unix() -
-                          this.end.clone().startOf("isoWeek").unix();
+    var week_when_stream_starts = this.start.clone().startOf("isoWeek").unix();
+    this.start_normalized = this.start.unix() - week_when_stream_starts;
+    this.end_normalized = this.end.unix() - week_when_stream_starts;
     this.dom_elements = [];
     this.canceled = canceled;
 }
@@ -64,6 +61,14 @@ Stream.prototype.is_live = function(since_week_start) {
     return since_week_start >= this.start_normalized &&
         since_week_start <= this.end_normalized;
 };
+
+Stream.prototype.same_stream_next_week = function () {
+    var clone = new Stream(this.start, this.duration);
+    var one_week = moment.duration(1, 'week').asSeconds();
+    clone.start_normalized += one_week;
+    clone.end_normalized += one_week;
+    return clone;
+}
 
 function base_format (moment_instance) {
     return moment_instance.minutes() > 0 ? ["h:m", "a"] : ["h", "a"];

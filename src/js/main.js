@@ -1,9 +1,9 @@
-// Author: XrXr
+ Author: XrXr
 // https://github.com/XrXr/WhenIsKateLive
 // License: MIT
 
 import schedule_data from './schedule';
-import { an_hour } from './constants';
+import { an_hour, a_week } from './constants';
 import display_schedule from './dom-manip/display-schedule';
 import make_streams from './stream/make-streams';
 import { add_class, remove_class, find } from './dom-manip/utils';
@@ -48,11 +48,10 @@ function calc_since_week_start (now) {
     var since_week_start = now_unix -
                            now.clone().startOf("isoWeek").unix();
     var since_day_start = now_unix - now.clone().startOf("day").unix();
-    // this will be non-zero on the days that the DST adjustment
-    // happens. On the day DST ends, the elapsed time at the end of the
-    // day is 25 hours. On the day DST starts, it's 23 hours.
-    var observed_difference = now.hour() -
-        Math.floor(since_day_start / an_hour);
+    // This is non-zero on the day of DST adjustment.
+    // On the day DST ends, the elapsed time at the end of the day is 25 hours.
+    // On the day DST starts, it's 23 hours.
+    var observed_difference = now.hour() - Math.floor(since_day_start / an_hour);
     since_week_start += observed_difference * an_hour;
     return since_week_start;
 }
@@ -68,12 +67,16 @@ var max_same_day = Math.max.apply(null, grouped_streams.map(function (e) {
 display_schedule(grouped_streams, max_same_day);
 
 var stream = streams[0];
-var current_day_of_week = -1;  // trigger a highlight
+var current_day_of_week;
 function tick() {
     var now = moment();
     var since_week_start = calc_since_week_start(now);
     var new_day_of_week = now.day();
     if (new_day_of_week !== current_day_of_week) {
+        if (stream.end_normalized > a_week) {
+            stream = streams[0];
+            return tick();
+        }
         highlight_today(streams, new_day_of_week, stream);
     }
     current_day_of_week = new_day_of_week;
@@ -96,6 +99,7 @@ add_class(loading_message_node, "hidden");
 remove_class(countdown_block, "hidden");
 tick();
 setInterval(tick, 1000);
+    window.calc_since_week_start = calc_since_week_start;
 
 if (window.export_internals) {
     window.get_countdown = get_countdown;

@@ -57,10 +57,15 @@ function setup_streams_tests () {
             found = find_next_stream(fixture, since_week_start(before));
             expect(fixture.indexOf(found)).to.equal(4);
         });
-        it('Should wrap around', function () {
+        it('Should wrap around to next week', function () {
             var subject = moment().startOf('isoWeek').add(6, 'd').add(22, 'h');
             var found = find_next_stream(fixture, since_week_start(subject));
-            expect(fixture.indexOf(found)).to.equal(1);
+            expect(found.start.isSame(fixture[1].start)).to.be.true;
+            expect(found.end.isSame(fixture[1].end)).to.be.true;
+            expect(found.duration).to.equal(fixture[1].duration);
+            var one_week = 604800;
+            expect(found.start_normalized).to.equal(fixture[1].start_normalized + one_week);
+            expect(found.end_normalized).to.equal(fixture[1].end_normalized + one_week);
         });
     });
     describe('Stream object', function() {
@@ -90,12 +95,21 @@ function setup_streams_tests () {
             });
         });
         describe('end_normalized property', function() {
-            it('should exist', function() {
-                expect(stream).to.have.property("end_normalized");
+            var start_time = moment().isoWeekday(7).hours(23).minutes(0).seconds(0);
+            var stream = new Stream(start_time, 4, false);
+            window.jojo = stream;
+
+            it('should be normalized to the week when stream starts', function() {
+                expect(stream.end_normalized).to.equal(moment.duration({
+                    days: 6,
+                    hours: 27
+                }).asSeconds());
             });
-            it('is a number', function() {
-                expect(stream.end_normalized).to.be.a('number');
-            });
+
+            it('should have a difference same as the duration in seconds', function () {
+                expect(stream.end_normalized - stream.start_normalized)
+                    .to.equal(moment.duration(4, 'hours').asSeconds());
+            })
         });
         describe('toString()', function() {
             it('returns special string for exactly noon', function () {

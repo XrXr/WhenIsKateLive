@@ -72,12 +72,9 @@
       this.end = this.start.clone();
       this.end.add('hours', duration);
       this.duration = duration;
-      // normalized to the start of the iso week
-      this.start_normalized = this.start.unix() -
-                              this.start.clone().
-                              startOf("isoWeek").unix();
-      this.end_normalized = this.end.unix() -
-                            this.end.clone().startOf("isoWeek").unix();
+      var week_when_stream_starts = this.start.clone().startOf("isoWeek").unix();
+      this.start_normalized = this.start.unix() - week_when_stream_starts;
+      this.end_normalized = this.end.unix() - week_when_stream_starts;
       this.dom_elements = [];
       this.canceled = canceled;
   }
@@ -129,6 +126,14 @@
       return since_week_start >= this.start_normalized &&
           since_week_start <= this.end_normalized;
   };
+
+  Stream.prototype.same_stream_next_week = function () {
+      var clone = new Stream(this.start, this.duration);
+      var one_week = moment.duration(1, 'week').asSeconds();
+      clone.start_normalized += one_week;
+      clone.end_normalized += one_week;
+      return clone;
+  }
 
   function base_format (moment_instance) {
       return moment_instance.minutes() > 0 ? ["h:m", "a"] : ["h", "a"];
@@ -237,15 +242,16 @@
           return !stream.canceled;
       });
       var found;
-      streams.some(function(stream) {
+      for (var i = 0; i < streams.length; i++) {
+          var stream = streams[i];
           if (since_week_start > stream.end_normalized) {
-              return false;  // continue
+              continue;
           }
           found = stream;
-          return true; // break
-      });
+          break;
+      }
       if (!found) {
-          return streams[0];
+          return streams[0].same_stream_next_week();
       }
       return found;
   }
@@ -382,11 +388,10 @@
       var since_week_start = now_unix -
                              now.clone().startOf("isoWeek").unix();
       var since_day_start = now_unix - now.clone().startOf("day").unix();
-      // this will be non-zero on the days that the DST adjustment
-      // happens. On the day DST ends, the elapsed time at the end of the
-      // day is 25 hours. On the day DST starts, it's 23 hours.
-      var observed_difference = now.hour() -
-          Math.floor(since_day_start / an_hour);
+      // This is non-zero on the day of DST adjustment.
+      // On the day DST ends, the elapsed time at the end of the day is 25 hours.
+      // On the day DST starts, it's 23 hours.
+      var observed_difference = now.hour() - Math.floor(since_day_start / an_hour);
       since_week_start += observed_difference * an_hour;
       return since_week_start;
   }
@@ -402,12 +407,16 @@
   display_schedule(grouped_streams, max_same_day);
 
   var stream = streams[0];
-  var current_day_of_week = -1;  // trigger a highlight
+  var current_day_of_week;
   function tick() {
       var now = moment();
       var since_week_start = calc_since_week_start(now);
       var new_day_of_week = now.day();
       if (new_day_of_week !== current_day_of_week) {
+          if (stream.end_normalized > a_week) {
+              stream = streams[0];
+              return tick();
+          }
           highlight_today(streams, new_day_of_week, stream);
       }
       current_day_of_week = new_day_of_week;
@@ -430,6 +439,7 @@
   remove_class(countdown_block, "hidden");
   tick();
   setInterval(tick, 1000);
+      window.calc_since_week_start = calc_since_week_start;
 
   if (window.export_internals) {
       window.get_countdown = get_countdown;
