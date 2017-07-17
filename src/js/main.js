@@ -11,7 +11,6 @@ import find_next_stream from './stream/find-next-stream';
 import { highlight_today, update_countdown } from './dom-manip/update';
 import get_countdown from './get-countdown';
 
-
 // Return [[Stream]]. The streams that are in the same array start on the
 // same day
 function group_streams (streams) {
@@ -66,43 +65,28 @@ var max_same_day = Math.max.apply(null, grouped_streams.map(function (e) {
 }));
 display_schedule(grouped_streams, max_same_day);
 
-var stream = streams[0];
-var current_day_of_week;
 function tick() {
     var now = moment();
     var since_week_start = calc_since_week_start(now);
-    var new_day_of_week = now.day();
-    if (new_day_of_week !== current_day_of_week) {
-        if (stream.end_normalized > a_week) {
-            stream = streams[0];
-            return tick();
-        }
-        highlight_today(streams, new_day_of_week, stream);
-    }
-    current_day_of_week = new_day_of_week;
+    var stream = find_next_stream(streams, since_week_start);
+    highlight_today(streams, now.day(), stream);
 
     if (stream.is_live(since_week_start)) {
-        return update_countdown(true);
+        update_countdown(true);
+    } else {
+        update_countdown(false, get_countdown(since_week_start,
+                                                     stream.start_normalized));
     }
-
-    if (since_week_start > stream.end_normalized) {
-        stream = find_next_stream(streams, since_week_start);
-        // stream is changed
-        highlight_today(streams, new_day_of_week, stream);
-        return tick();
-    }
-    return update_countdown(false, get_countdown(since_week_start,
-                                                 stream.start_normalized));
 }
 
 add_class(loading_message_node, "hidden");
 remove_class(countdown_block, "hidden");
 tick();
 setInterval(tick, 1000);
-    window.calc_since_week_start = calc_since_week_start;
 
 if (window.export_internals) {
+    window.calc_since_week_start = calc_since_week_start;
+    window.find_next_stream = find_next_stream;
     window.get_countdown = get_countdown;
     window.streams = streams;
-    window.find_next_stream = find_next_stream;
 }

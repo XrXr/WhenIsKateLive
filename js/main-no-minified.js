@@ -234,28 +234,6 @@
       return node;
   }
 
-  // Return a Stream that is currently live. If no such Stream exists,
-  // return the Stream with the closest start time that is in the future.
-  // Canceled streams are ignored
-  function find_next_stream (streams, since_week_start) {
-      streams = streams.filter(function (stream) {
-          return !stream.canceled;
-      });
-      var found;
-      for (var i = 0; i < streams.length; i++) {
-          var stream = streams[i];
-          if (since_week_start > stream.end_normalized) {
-              continue;
-          }
-          found = stream;
-          break;
-      }
-      if (!found) {
-          return streams[0].same_stream_next_week();
-      }
-      return found;
-  }
-
   function pluralize (integer, string) {
       var base = integer + " " + string;
       if (integer > 1) {
@@ -297,6 +275,28 @@
           delta += a_week;
       }
       return format_countdown(delta);
+  }
+
+  // Return a Stream that is currently live. If no such Stream exists,
+  // return the Stream with the closest start time that is in the future.
+  // Canceled streams are ignored
+  function find_next_stream (streams, since_week_start) {
+      streams = streams.filter(function (stream) {
+          return !stream.canceled;
+      });
+      var found;
+      for (var i = 0; i < streams.length; i++) {
+          var stream = streams[i];
+          if (since_week_start > stream.end_normalized) {
+              continue;
+          }
+          found = stream;
+          break;
+      }
+      if (!found) {
+          return streams[0].same_stream_next_week();
+      }
+      return found;
   }
 
   var prefix = find("h3");
@@ -406,45 +406,30 @@
   }));
   display_schedule(grouped_streams, max_same_day);
 
-  var stream = streams[0];
-  var current_day_of_week;
   function tick() {
       var now = moment();
       var since_week_start = calc_since_week_start(now);
-      var new_day_of_week = now.day();
-      if (new_day_of_week !== current_day_of_week) {
-          if (stream.end_normalized > a_week) {
-              stream = streams[0];
-              return tick();
-          }
-          highlight_today(streams, new_day_of_week, stream);
-      }
-      current_day_of_week = new_day_of_week;
+      var stream = find_next_stream(streams, since_week_start);
+      highlight_today(streams, now.day(), stream);
 
       if (stream.is_live(since_week_start)) {
-          return update_countdown(true);
+          update_countdown(true);
+      } else {
+          update_countdown(false, get_countdown(since_week_start,
+                                                       stream.start_normalized));
       }
-
-      if (since_week_start > stream.end_normalized) {
-          stream = find_next_stream(streams, since_week_start);
-          // stream is changed
-          highlight_today(streams, new_day_of_week, stream);
-          return tick();
-      }
-      return update_countdown(false, get_countdown(since_week_start,
-                                                   stream.start_normalized));
   }
 
   add_class(loading_message_node, "hidden");
   remove_class(countdown_block, "hidden");
   tick();
   setInterval(tick, 1000);
-      window.calc_since_week_start = calc_since_week_start;
 
   if (window.export_internals) {
+      window.calc_since_week_start = calc_since_week_start;
+      window.find_next_stream = find_next_stream;
       window.get_countdown = get_countdown;
       window.streams = streams;
-      window.find_next_stream = find_next_stream;
   }
 
 })();
