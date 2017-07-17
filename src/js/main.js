@@ -88,5 +88,7 @@ if (window.export_internals) {
     window.calc_since_week_start = calc_since_week_start;
     window.find_next_stream = find_next_stream;
     window.get_countdown = get_countdown;
+    window.group_streams = group_streams;
+    window.tick = tick;
     window.streams = streams;
 }

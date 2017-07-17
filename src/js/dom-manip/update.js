@@ -29,9 +29,9 @@ export function update_countdown (live, countdown_string) {
 var BLACK = "#333";
 var GREY = "grey";
 
-// highlight all the streams that starts on `today`. `today` is an integer
-// with Sunday as 0 and Saturday as 6. If no stream is happening on `today`
-// highlight all streams that starts on the same day of `next_stream`
+// highlight all the streams that starts on `today`. `today` is a day from
+// moment. If no stream is happening on `today` highlight all streams
+// that starts on the same day of `next_stream`
 export function highlight_today(streams, today, next_stream) {
     var found = false;
     var i, j;
