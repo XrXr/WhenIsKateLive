@@ -416,7 +416,7 @@
           update_countdown(true);
       } else {
           update_countdown(false, get_countdown(since_week_start,
-                                                       stream.start_normalized));
+                                                stream.start_normalized));
       }
   }
 
